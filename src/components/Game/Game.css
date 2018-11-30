@@ -1,0 +1,17 @@
+#gameHeader{
+    padding: 10px;
+    background-color: #1abc9c;
+    margin: 10px;
+    width:400px;
+}
+
+#gameHeader h4{
+    color:white;
+}
+
+#bottomMenu button{
+    border:0;
+    margin:5px;
+    padding:5px 10px;
+    cursor:pointer;
+}
