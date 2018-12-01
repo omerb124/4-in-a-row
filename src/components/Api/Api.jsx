@@ -9,11 +9,11 @@ function getRoomData(cb) {
     socket.emit('getRoomData', 1000, "2rfLFPs");
 }
 
-function createRoom(cb){
+function createRoom(settings,cb){
     socket.on('roomOpened', (v) => {
         cb(null,v);
     });
-    socket.emit('createRoom');
+    socket.emit('createRoom',settings);
 }
 
 export { getRoomData, createRoom };
