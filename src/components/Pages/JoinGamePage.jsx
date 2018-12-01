@@ -1,4 +1,5 @@
 import React from 'react';
+import {Redirect} from 'react-router-dom';
 import { addPlayer } from '../Api/Api';
 import NiceBox from '../Utils/NiceBox.jsx';
 
@@ -11,6 +12,10 @@ class JoinGamePage extends React.Component {
             name: null,
             color: null
         };
+
+        this.name = React.createRef();
+        this.color = React.createRef();
+
         this.handleJoiningRoom = this.handleJoiningRoom.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
     }
@@ -24,7 +29,32 @@ class JoinGamePage extends React.Component {
     }
 
     handleJoiningRoom() {
+        const playerSettings = {
+            name : this.state.name,
+            color : this.state.color
+        };
+        addPlayer(playerSettings,(err,response) => {
+            if(response.status === 200){
+                if(response.players.length === 2){
+                    // Players are ready, let the game begin
+                    this.setState({
+                        redirectToGame : true
+                    });
+                }
+            }
+            else{
+                console.log("An error has been occured.");
+            }
+        });
+    }
 
+    validateParams(){
+        return (
+            this.state.name &&
+            this.state.name.length > 0 &&
+            this.state.color &&
+            this.state.color.length > 0
+        );
     }
 
     render() {
@@ -60,6 +90,12 @@ class JoinGamePage extends React.Component {
 
             </div>
         </div >;
+
+        if(this.state.redirectToGame){
+            return (
+                <Redirect to="/bobof" />
+            );
+        }
 
         return (
             <NiceBox
