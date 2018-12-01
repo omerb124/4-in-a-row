@@ -6,6 +6,7 @@ import StartPage from '../Pages/StartPage.jsx';
 import AboutPage from '../Pages/AboutPage.jsx';
 import CreateGamePage from '../Pages/CreateGamePage.jsx';
 import NotFoundPage from '../Pages/NotFoundPage.jsx';
+import CreateGameWaitPage from '../Pages/CreateGameWaitPage.jsx';
 
 import './MainApp.css';
 
@@ -19,7 +20,8 @@ class MainApp extends React.Component {
                     <Header />
                     <Switch>
                         <Route exact path='/' component={StartPage} />
-                        <Route path='/game/:id' component={Game} />
+                        <Route exact path='/game/:id' component={Game} />
+                        <Route path='/game/:id/wait' component={CreateGameWaitPage} />
                         <Route path='/about' component={AboutPage} />
                         <Route path='/create' component={CreateGamePage} />
                         <Route component={NotFoundPage} />

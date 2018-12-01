@@ -1,19 +1,26 @@
 import openSocket from 'socket.io-client';
-const socket = openSocket('http://localhost:8000');
+const socket = openSocket('http://localhost:5000');
 
 function getRoomData(cb) {
     socket.on('retRoomData', (v) => {
         // Client gets server response
-        cb(null,v);
+        cb(null, v);
     });
     socket.emit('getRoomData', 1000, "2rfLFPs");
 }
 
-function createRoom(settings,cb){
+function createRoom(cb) {
     socket.on('roomOpened', (v) => {
-        cb(null,v);
+        cb(null, v);
     });
-    socket.emit('createRoom',settings);
+    socket.emit('createRoom');
 }
 
-export { getRoomData, createRoom };
+function addPlayer(settings, cb) {
+    socket.on('playerAdded', (v) => {
+        cb(null, v);
+    });
+    socket.emit('playerJoined', settings);
+}
+
+export { getRoomData, createRoom, addPlayer };

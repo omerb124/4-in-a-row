@@ -6,17 +6,3 @@ body{
     direction: rtl;
 }
 
-.nice-box {
-    background-color: #1abc9c;
-    color: white;
-    margin: 10px;
-    padding: 0;
-}
-
-.nice-box #title {
-    background-color: #16a085;
-}
-
-.nice-box title h4 {
-    padding: 10px;
-}

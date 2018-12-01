@@ -2,7 +2,8 @@ import React from 'react';
 import { Link, Redirect } from 'react-router-dom';
 import './CreateGamePage.css';
 import NiceBox from '../Utils/NiceBox.jsx';
-import { createRoom } from '../Api/Api.jsx';
+import {createRoom} from '../Api/Api.jsx';
+
 
 class CreateGamePage extends React.Component {
 
@@ -76,10 +77,11 @@ class CreateGamePage extends React.Component {
             color: this.state.color,
             name: this.state.name
         };
-        createRoom(playerSettings, (err, v) => {
+        createRoom((err, v) => {
             if (v.roomId) {
                 this.setState(
                     {
+                        playerSettings: playerSettings,
                         roomId: v.roomId,
                         toGamePage: true
                     }
@@ -117,13 +119,13 @@ class CreateGamePage extends React.Component {
         const form = <div id="settingsForm" style={style}>
             <div id="form">
                 <div className="form-group row">
-                    <label htmlFor="player1_name" className="text-center col-3 col-form-label">שם שחקן 1</label>
+                    <label htmlFor="player1_name" className="text-center col-3 col-form-label">שם שחקן</label>
                     <div className="col-6">
                         <input className="form-control" required type="text" placeholder=" הזן שם..." id="playerOneName" ref={this.name} />
                     </div>
                 </div>
                 <div className="form-group row">
-                    <label htmlFor="player1_name" className="text-center col-3 col-form-label">צבע שחקן 1</label>
+                    <label htmlFor="player1_name" className="text-center col-3 col-form-label">צבע שחקן</label>
                     <div className="col-6">
                         <input className="form-control" style={colorInputStyle} type="color" id="playerOneColor" defaultValue="#f1c40f" list="colors" ref={this.color} />
                     </div>
@@ -142,7 +144,10 @@ class CreateGamePage extends React.Component {
         if (this.state.toGamePage) {
             return (
                 <Redirect
-                    to={`/game/${this.state.roomId}`}
+                    to={{
+                        pathname: `/game/${this.state.roomId}/wait`,
+                        state: { playerSettings: this.state.playerSettings}
+                    }}
                 />
             );
         }
