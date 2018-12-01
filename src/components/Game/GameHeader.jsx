@@ -7,7 +7,12 @@ class GameHeader extends React.Component {
 
     constructor(props) {
         super(props);
+
+        this.state = {
+            props : props
+        };
     }
+
 
     getBtnsMenu() {
         return (
@@ -17,9 +22,9 @@ class GameHeader extends React.Component {
                         <Switch>
                             <Route
                                 exact
-                                path="/game"
+                                path={`/game/${this.state.props.roomId}`}
                                 render={() => (
-                                    <Link to='/game/results' key="1">
+                                    <Link to={`/game/${this.state.props.roomId}/results`} key="1">
                                         <button id="watchResultsTable" className="btn-success" key="1">
                                             צפה בלוח תוצאות
                                         </button>
@@ -27,10 +32,10 @@ class GameHeader extends React.Component {
                                 )}
                             />
                             <Route
-                                exact
-                                path="/game/results"
+                                
+                                path={`/game/${this.state.props.roomId}/results`}
                                 render={() => (
-                                    <Link to='/game' key="1">
+                                    <Link to={`/game/${this.state.props.roomId}`} key="1">
                                         <button id="watchResultsTable" className="btn-success" key="1">
                                             חזור למשחק
                                         </button>
@@ -39,7 +44,7 @@ class GameHeader extends React.Component {
                             />
 
                         </Switch>
-                        <button id="startNewGame" onClick={this.props.handleStartNewGame} className="btn-success" key="1">
+                        <button id="startNewGame" onClick={this.state.props.handleStartNewGame} className="btn-success" key="1">
                             התחל משחק חדש
                         </button>
                     </div>

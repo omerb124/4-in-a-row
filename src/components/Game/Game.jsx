@@ -1,5 +1,5 @@
 import React from 'react';
-import { Switch, Route, Link } from 'react-router-dom';
+import { Switch, Route, Link, Redirect } from 'react-router-dom';
 
 //import './Game.css';
 import Board from './Board.jsx';
@@ -17,18 +17,18 @@ class Game extends React.Component {
         this.height = 9; // Rows amount
         this.activeRowColor = "#ecf0f1"; // Active row color
 
-        // Players
-        if (!this.players) {
-            this.players = [];
-            this.players[0] = {
-                color: "#f1c40f",
-                name: "שחקן 1"
-            };
-            this.players[1] = {
-                color: "#e74c3c",
-                name: "שחקן 2"
-            };
-        }
+        // // Players
+        // if (!this.state.players) {
+        //     this.state.players = [];
+        //     this.state.players[0] = {
+        //         color: "#f1c40f",
+        //         name: "שחקן 1"
+        //     };
+        //     this.state.players[1] = {
+        //         color: "#e74c3c",
+        //         name: "שחקן 2"
+        //     };
+        // }
 
 
         this.state = {
@@ -43,6 +43,7 @@ class Game extends React.Component {
         this.handleRowClick = this.handleRowClick.bind(this);
         this.findEmptySpot = this.findEmptySpot.bind(this);
         this.handleStartNewGame = this.handleStartNewGame.bind(this);
+        //this.handleGameStatus = this.handleGameStatus.bind(this);
 
     }
 
@@ -54,7 +55,7 @@ class Game extends React.Component {
     // Adding result to results table
     addGameResult(winner) {
         if (!this.state.resultAdded) {
-            let wonPlayerName = winner === "0" ? this.players[0].name :this.players[1].name;
+            let wonPlayerName = winner === "0" ? this.state.players[0].name : this.state.players[1].name;
             const currentDate = new Date().toLocaleString();
             let newTable = Object.values(Object.assign({}, this.state.resultsTable));
             console.log("NEW TABLE " + newTable);
@@ -65,6 +66,7 @@ class Game extends React.Component {
                 resultAdded: true
             });
         }
+
 
     }
 
@@ -86,7 +88,8 @@ class Game extends React.Component {
         else {
             this.setState({
                 board: this.createBoard(),
-                isPlayer1Turn: true
+                isPlayer1Turn: true,
+                resultAdded: false
             });
         }
     }
@@ -281,13 +284,28 @@ class Game extends React.Component {
 
     // component will mount
     componentWillMount() {
+        let players;
         if (this.props.location.params) {
-            this.players[0].name = this.props.location.params.name1;
-            this.players[0].color = this.props.location.params.color1;
-            this.players[1].name = this.props.location.params.name2;
-            this.players[1].color = this.props.location.params.color2;
+            players = [];
+            players.push({ name: this.props.location.params.name1, color: this.props.location.params.color1 });
+            players.push({ name: this.props.location.params.name2, color: this.props.location.params.color2 });
+
+
+
+
         }
-        console.log(this.props.location);
+        else {
+            players = [
+                { name: "gggg", color: "black" },
+                { name: "bbbb", color: "#ffffff" }
+            ];
+        }
+        this.setState(
+            {
+                players: players
+            }
+        );
+
         document.addEventListener("keyup", this._handleKeyPress.bind(this));
     }
 
@@ -295,7 +313,7 @@ class Game extends React.Component {
     renderBoard() {
         return (
             <Board
-                players={this.players}
+                players={this.state.players}
                 activeRow={this.state.activeRow}
                 activeRowColor={this.activeRowColor}
                 width={this.width}
@@ -310,15 +328,32 @@ class Game extends React.Component {
         return Object.values(this.state.board).every(arr => Object.values(arr).every(value => value !== ""));
     }
 
-    render() {
-        console.log(this.state.isPlayer1Turn);
+    // // handling game status
+    // handleGameStatus(){
 
-        // Status
+    //     return status;
+    // }
+
+    // Validate that the room is available to join
+    validateRoomId() {
+        let roomId;
+        if(this.props.match.params.id){
+            roomId = this.props.match.params.id;
+            return roomId;
+        }
+        else{
+            console.log(this.props.match);
+            return false;
+        }
+    }
+
+    handleGameStatus() {
+
         let status;
         const winner = this.checkWinner(); // Check if there is a winner
-        const fullBoard = this.checkBoardFullness();
+        const fullBoard = this.checkBoardFullness(); // Board fullness check
         const style = {
-            color: this.state.isPlayer1Turn ? this.players[0].color : this.players[1].color
+            color: this.state.isPlayer1Turn ? this.state.players[0].color : this.state.players[1].color
         };
 
         if (!winner) {
@@ -327,14 +362,28 @@ class Game extends React.Component {
                 status = "תיקו יא חביבי";
             }
             else {
-                status = <span>התור של <span style={style}>{this.state.isPlayer1Turn ? this.players[0].name : this.players[1].name}</span></span>
+                status = <span>התור של <span style={style}>{this.state.isPlayer1Turn ? this.state.players[0].name : this.state.players[1].name}</span></span>
             }
         }
         else {
             // Add Winning to results table
             this.addGameResult(winner);
-            status = <span>המנצח הוא <span style={{ color: this.players[winner].color }}>{winner === "0" ? this.players[0].name : this.players[1].name}</span></span>
+            status = <span>המנצח הוא <span style={{ color: this.state.players[winner].color }}>{winner === "0" ? this.state.players[0].name : this.state.players[1].name}</span></span>
         }
+        return status;
+    }
+
+    render() {
+        let roomId = this.validateRoomId();
+        if(!roomId){
+            return (<Redirect to="/roomNotFound" />);
+        }
+
+        console.log(roomId);
+
+        // Handling game status
+        let status = this.handleGameStatus();
+
 
         return (
             <div className="container-fluid">
@@ -344,10 +393,11 @@ class Game extends React.Component {
                             <GameHeader
                                 status={status}
                                 handleStartNewGame={this.handleStartNewGame}
+                                roomId={roomId}
                             />
                             <Switch>
-                                <Route exact path='/game' component={() => this.renderBoard()} />
-                                <Route path='/game/results' component={() => <ResultsTable table={this.state.resultsTable} />} />
+                                <Route exact path='/game/:id' component={() => this.renderBoard()} />
+                                <Route path='/game/:id/results' component={() => <ResultsTable table={this.state.resultsTable} />} />
                             </Switch>
 
                         </div>

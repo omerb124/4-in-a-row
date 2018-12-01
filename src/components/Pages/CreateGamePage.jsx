@@ -27,6 +27,20 @@ class CreateGamePage extends React.Component {
 
         //this.handleChange = this.handleChange.bind(this);
         this.getLinkObject = this.getLinkObject.bind(this);
+        this.generateRoomId = this.generateRoomId.bind(this);
+    }
+
+    generateRoomId(){
+        let L = 10; // ID Length
+        let s = '';
+        let randomchar = function() {
+            let n = Math.floor(Math.random() * 62);
+            if (n < 10) return n; //1-10
+            if (n < 36) return String.fromCharCode(n + 55); //A-Z
+            return String.fromCharCode(n + 61); //a-z
+        }
+        while (s.length < L) s += randomchar();
+        return s;
     }
 
     // Validate that the whole params are ok
@@ -38,8 +52,10 @@ class CreateGamePage extends React.Component {
     }
 
     getLinkObject() {
+        const roomId = this.generateRoomId();
         return {
-            'pathname': '/game',
+            'pathname': '/game/' + roomId,
+            'roomId' : roomId,
             'params': this.state
         };
     }

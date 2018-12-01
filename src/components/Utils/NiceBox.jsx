@@ -3,6 +3,7 @@ import './NiceBox.css';
 
 function NiceBox(props) {
 
+    const textStyle = props.textStyle ? props.textStyle : {};
     return (
         <div className="container-fluid">
             <div className="row">
@@ -11,7 +12,7 @@ function NiceBox(props) {
                         <h4>{props.title}</h4>
                     </div>
                     {props.text &&
-                        <div id="box-text">
+                        <div id="box-text" style={textStyle}>
                             {props.text}
                         </div>
                     }
