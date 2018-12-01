@@ -1,6 +1,7 @@
 import React from 'react';
-
 import { Route, Link, Switch } from 'react-router-dom';
+
+import './GameHeader.css';
 
 class GameHeader extends React.Component {
 
@@ -46,6 +47,7 @@ class GameHeader extends React.Component {
             </div>
         );
     }
+
     render() {
         return (
             <div id="gameHeader" className="text-center mx-auto">

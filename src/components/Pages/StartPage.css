@@ -1,0 +1,10 @@
+.actionBtn{
+    display:inline-block;
+    background-color: #16a085;
+    border: 0;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 10px;
+    color: white;
+    margin:5px;
+}

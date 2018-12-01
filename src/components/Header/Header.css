@@ -1,36 +1,42 @@
-  a:link, a:visited { 
-      color: red/* browser's internal value */;
-      text-decoration: none;
-      cursor: auto;
-      color:inherit;
+  a:link, a:visited {
+    color: red/* browser's internal value */;
+    text-decoration: none;
+    color: inherit;
   }
+
+  a {
+    cursor: pointer;
+  }
+
   nav {
     background-color: #3498db;
-    height:50px;
-    font-family:Arimo;
+    height: 50px;
+    font-family: Arimo;
   }
-  #gameName{
-  
+
+  #gameName {
     display: inline-block;
-    padding:8px;
+    padding: 8px;
   }
-  #gameName a{
-    color:white;
-    font-size:24px;
-    height:50px;
-    padding:4px 10px;
+
+  #gameName a {
+    color: white;
+    font-size: 24px;
+    height: 50px;
+    padding: 4px 10px;
     line-spacing: 10px;
-    background-color:#2980b9;
-  
+    background-color: #2980b9;
   }
-  #mainMenu{
-    display:inline-block;
-    padding-inline-start:10px;
+
+  #mainMenu {
+    display: inline-block;
+    padding-inline-start: 10px;
   }
-  #mainMenu li{
-    list-style:none;
-    display:inline;
-    color:white;
-    font-size:18px;
-    margin:5px;
+
+  #mainMenu li {
+    list-style: none;
+    display: inline;
+    color: white;
+    font-size: 18px;
+    margin: 5px;
   }

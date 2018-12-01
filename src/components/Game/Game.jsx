@@ -1,9 +1,9 @@
 import React from 'react';
 import { Switch, Route, Link } from 'react-router-dom';
 
-import './Game.css';
+//import './Game.css';
 import Board from './Board.jsx';
-import Results from './Results.jsx';
+import ResultsTable from './ResultsTable.jsx';
 import GameHeader from './GameHeader.jsx';
 
 // Whole game component
@@ -18,29 +18,32 @@ class Game extends React.Component {
         this.activeRowColor = "#ecf0f1"; // Active row color
 
         // Players
-        this.players = [];
-        this.players[0] = {
-            color: "#f1c40f"
-        };
-        this.players[1] = {
-            color: "#e74c3c"
-        };
+        if (!this.players) {
+            this.players = [];
+            this.players[0] = {
+                color: "#f1c40f",
+                name: "שחקן 1"
+            };
+            this.players[1] = {
+                color: "#e74c3c",
+                name: "שחקן 2"
+            };
+        }
 
-        // Results table
-        this.resultsTable = [];
 
         this.state = {
             // Turn changer
             isPlayer1Turn: true,
             board: this.createBoard(),
             activeRow: Math.round((this.width - 1) / 2),
-            currentTurn: 1
+            currentTurn: 1,
+            resultsTable: []
         };
 
         this.handleRowClick = this.handleRowClick.bind(this);
         this.findEmptySpot = this.findEmptySpot.bind(this);
-        this.getBottomMenu = this.getBottomMenu.bind(this);
         this.handleStartNewGame = this.handleStartNewGame.bind(this);
+
     }
 
     // Create empty board
@@ -50,9 +53,19 @@ class Game extends React.Component {
 
     // Adding result to results table
     addGameResult(winner) {
-        let wonPlayer = winner === "0" ? "1" : "2";
-        const currentDate = new Date().toLocaleString();
-        this.resultsTable.push({ wonPlayer: wonPlayer, currentDate: currentDate });
+        if (!this.state.resultAdded) {
+            let wonPlayerName = winner === "0" ? this.players[0].name :this.players[1].name;
+            const currentDate = new Date().toLocaleString();
+            let newTable = Object.values(Object.assign({}, this.state.resultsTable));
+            console.log("NEW TABLE " + newTable);
+            newTable.push({ wonPlayerName: wonPlayerName, currentDate: currentDate });
+            console.log(newTable);
+            this.setState({
+                resultsTable: newTable,
+                resultAdded: true
+            });
+        }
+
     }
 
     // Handling request for start a new game
@@ -268,6 +281,13 @@ class Game extends React.Component {
 
     // component will mount
     componentWillMount() {
+        if (this.props.location.params) {
+            this.players[0].name = this.props.location.params.name1;
+            this.players[0].color = this.props.location.params.color1;
+            this.players[1].name = this.props.location.params.name2;
+            this.players[1].color = this.props.location.params.color2;
+        }
+        console.log(this.props.location);
         document.addEventListener("keyup", this._handleKeyPress.bind(this));
     }
 
@@ -307,14 +327,13 @@ class Game extends React.Component {
                 status = "תיקו יא חביבי";
             }
             else {
-                status = <span>התור של <span style={style}>{this.state.isPlayer1Turn ? "שחקן 1" : "שחקן 2"}</span></span>
+                status = <span>התור של <span style={style}>{this.state.isPlayer1Turn ? this.players[0].name : this.players[1].name}</span></span>
             }
         }
         else {
             // Add Winning to results table
             this.addGameResult(winner);
-            console.log(this.resultsTable);
-            status = <span>המנצח הוא <span style={{ color: this.players[winner].color }}>{winner === "0" ? "שחקן 1" : "שחקן 2"}</span></span>
+            status = <span>המנצח הוא <span style={{ color: this.players[winner].color }}>{winner === "0" ? this.players[0].name : this.players[1].name}</span></span>
         }
 
         return (
@@ -324,11 +343,11 @@ class Game extends React.Component {
                         <div>
                             <GameHeader
                                 status={status}
-                                handleStartNewGame ={this.handleStartNewGame}
+                                handleStartNewGame={this.handleStartNewGame}
                             />
                             <Switch>
                                 <Route exact path='/game' component={() => this.renderBoard()} />
-                                <Route path='/game/results' component={Results} />
+                                <Route path='/game/results' component={() => <ResultsTable table={this.state.resultsTable} />} />
                             </Switch>
 
                         </div>

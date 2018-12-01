@@ -1,11 +1,3 @@
-body{
-    margin:0;
-    padding:0;
-    /** RTL */
-    text-align: right;
-    direction: rtl;
-}
-
 .nice-box {
     background-color: #1abc9c;
     color: white;
@@ -17,6 +9,10 @@ body{
     background-color: #16a085;
 }
 
-.nice-box title h4 {
+.nice-box #title h4 {
     padding: 10px;
+}
+
+.nice-box #box-text{
+    padding:10px;
 }

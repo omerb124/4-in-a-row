@@ -8,7 +8,7 @@ const Header = () => (
             <Link to='/'>ארבע בפאקינג שורה!</Link>
         </div>
         <ul id="mainMenu">
-            <li>אודות!</li>
+            <Link to="/about"><li>אודות!</li></Link>
             <li>חוקים!</li>
             <li>אל תלחץ פה</li>
         </ul>
