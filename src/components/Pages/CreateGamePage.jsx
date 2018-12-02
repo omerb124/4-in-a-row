@@ -23,23 +23,8 @@ class CreateGamePage extends React.Component {
         this.name = React.createRef();
         this.color = React.createRef();
 
-        //this.handleChange = this.handleChange.bind(this);
-        this.getLinkObject = this.getLinkObject.bind(this);
-        this.generateRoomId = this.generateRoomId.bind(this);
+        this.handleChange = this.handleChange.bind(this);
         this.handleCreateRoom = this.handleCreateRoom.bind(this);
-    }
-
-    generateRoomId() {
-        let L = 10; // ID Length
-        let s = '';
-        let randomchar = function () {
-            let n = Math.floor(Math.random() * 62);
-            if (n < 10) return n; //1-10
-            if (n < 36) return String.fromCharCode(n + 55); //A-Z
-            return String.fromCharCode(n + 61); //a-z
-        }
-        while (s.length < L) s += randomchar();
-        return s;
     }
 
     // Validate that the whole params are ok
@@ -48,15 +33,6 @@ class CreateGamePage extends React.Component {
         console.log(Object.values(this.state));
         Object.values(this.state).forEach((a) => { if (!a) valid = false });
         return valid;
-    }
-
-    getLinkObject() {
-        const roomId = this.generateRoomId();
-        return {
-            'pathname': '/game/' + roomId,
-            'roomId': roomId,
-            'params': this.state
-        };
     }
 
     componentDidMount() {
@@ -77,7 +53,7 @@ class CreateGamePage extends React.Component {
             color: this.state.color,
             name: this.state.name
         };
-        createRoom((err, v) => {
+        createRoom(playerSettings,  (err, v) => {
             if (v.roomId) {
                 this.setState(
                     {
@@ -127,7 +103,7 @@ class CreateGamePage extends React.Component {
                 <div className="form-group row">
                     <label htmlFor="player1_name" className="text-center col-3 col-form-label">צבע שחקן</label>
                     <div className="col-6">
-                        <input className="form-control" style={colorInputStyle} type="color" id="playerOneColor" defaultValue="#f1c40f" list="colors" ref={this.color} />
+                        <input className="form-control" onChange={this.handleChange} style={colorInputStyle} type="color" id="playerOneColor" defaultValue="#f1c40f" list="colors" ref={this.color} />
                     </div>
                 </div>
             </div>

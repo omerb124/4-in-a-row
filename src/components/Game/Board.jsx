@@ -15,7 +15,7 @@ class Board extends React.Component {
                 let activeRow = j === this.props.activeRow;
 
                 // Paint active rows
-                if (activeRow) {
+                if (activeRow && this.props.myTurn) {
                     color = this.props.activeRowColor;
                 }
 
@@ -32,7 +32,6 @@ class Board extends React.Component {
                         row={j}
                         line={i}
                         color={color}
-                        activeRow={j === this.props.activeRow}
                     //onClick={(row) => this.handleRowClick(row)}
                     />
                 );

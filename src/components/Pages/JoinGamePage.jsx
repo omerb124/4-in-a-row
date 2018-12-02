@@ -1,6 +1,6 @@
 import React from 'react';
-import {Redirect} from 'react-router-dom';
-import { addPlayer } from '../Api/Api';
+import { Redirect } from 'react-router-dom';
+import { joinRoom } from '../Api/Api';
 import NiceBox from '../Utils/NiceBox.jsx';
 
 class JoinGamePage extends React.Component {
@@ -22,33 +22,38 @@ class JoinGamePage extends React.Component {
 
     // Handling input change
     handleInputChange() {
+        
         this.setState({
             name: this.name.current.value,
             color: this.color.current.value
         });
+
+        console.log(this.state.color);
     }
 
     handleJoiningRoom() {
         const playerSettings = {
-            name : this.state.name,
-            color : this.state.color
+            name: this.state.name,
+            color: this.state.color
         };
-        addPlayer(playerSettings,(err,response) => {
-            if(response.status === 200){
-                if(response.players.length === 2){
-                    // Players are ready, let the game begin
-                    this.setState({
-                        redirectToGame : true
-                    });
-                }
+        const roomId = this.props.match.params.id;
+        joinRoom(playerSettings, roomId, (err, response) => {
+            if (!response.err) {
+                // Success
+                this.setState({
+                    redirectToGame: true,
+                    roomData: response.roomData,
+                    playerId: 2
+                });
             }
-            else{
-                console.log("An error has been occured.");
+            else {
+                // Error
+                console.log("Error:", response.err);
             }
         });
     }
 
-    validateParams(){
+    validateParams() {
         return (
             this.state.name &&
             this.state.name.length > 0 &&
@@ -78,7 +83,7 @@ class JoinGamePage extends React.Component {
                 <div className="form-group row">
                     <label htmlFor="player1_name" className="text-center col-3 col-form-label">צבע שחקן</label>
                     <div className="col-6">
-                        <input className="form-control" onKeyUp={this.handleInputChange} style={colorInputStyle} type="color" id="playerOneColor" defaultValue="#f1c40f" list="colors" ref={this.color} />
+                        <input className="form-control" onChange={this.handleInputChange} style={colorInputStyle} type="color" id="playerOneColor" defaultValue="#f1c40f" list="colors" ref={this.color} />
                     </div>
                 </div>
             </div>
@@ -91,10 +96,15 @@ class JoinGamePage extends React.Component {
             </div>
         </div >;
 
-        if(this.state.redirectToGame){
-            return (
-                <Redirect to="/bobof" />
-            );
+        if (this.state.redirectToGame) {
+            return (<Redirect
+                to={{
+                    pathname: `/game/${this.props.match.params.id}`,
+                    state: {
+                        roomData: this.state.roomData,
+                        playerId: this.state.playerId
+                    }
+                }} />);
         }
 
         return (

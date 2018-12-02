@@ -9,18 +9,35 @@ function getRoomData(cb) {
     socket.emit('getRoomData', 1000, "2rfLFPs");
 }
 
-function createRoom(cb) {
+function createRoom(Player,cb) {
     socket.on('roomOpened', (v) => {
         cb(null, v);
     });
-    socket.emit('createRoom');
+    socket.emit('createRoom',Player);
 }
 
-function addPlayer(settings, cb) {
-    socket.on('playerAdded', (v) => {
+function waitForGameToStart(cb){
+    socket.on('startGame',(v) => {
+        cb(null,v);
+    });
+}
+
+function joinRoom(player,roomId, cb) {
+    socket.on('startGame', (v) => {
         cb(null, v);
     });
-    socket.emit('playerJoined', settings);
+    socket.emit('joinRoom', player,roomId);
 }
 
-export { getRoomData, createRoom, addPlayer };
+function doTurn(roomId,playerId,newBoard){
+    socket.emit("doTurn", roomId,playerId, newBoard);
+}
+
+function getUpdate(cb){
+    socket.on("gameUpdate", (v) => {
+        console.log("...!!!");
+        cb(null,v);
+    });
+}
+
+export { getRoomData, createRoom, joinRoom, waitForGameToStart, doTurn, getUpdate };
