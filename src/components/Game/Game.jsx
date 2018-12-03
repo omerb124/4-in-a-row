@@ -5,7 +5,7 @@ import { Switch, Route, Link, Redirect } from 'react-router-dom';
 import Board from './Board.jsx';
 import ResultsTable from './ResultsTable.jsx';
 import GameHeader from './GameHeader.jsx';
-import {getUpdate, doTurn} from '../Api/Api.jsx';
+import { getUpdate, doTurn } from '../Api/Api.jsx';
 
 // Whole game component
 class Game extends React.Component {
@@ -49,7 +49,7 @@ class Game extends React.Component {
         this.handleRowClick = this.handleRowClick.bind(this);
         this.findEmptySpot = this.findEmptySpot.bind(this);
         this.handleStartNewGame = this.handleStartNewGame.bind(this);
-        
+
         //this.handleGameStatus = this.handleGameStatus.bind(this);
 
     }
@@ -78,11 +78,11 @@ class Game extends React.Component {
     }
 
     // Handle game update
-    handleGameUpdate(err,response){
-        if(response.updatedData){
+    handleGameUpdate(err, response) {
+        if (response.updatedData) {
             this.setState({
                 board: response.updatedData.board,
-                isPlayer1Turn : response.updatedData.turn
+                isPlayer1Turn: response.updatedData.turn
             });
             console.log("Game has been updated");
         }
@@ -91,7 +91,7 @@ class Game extends React.Component {
     // Will mount
     componentWillMount() {
         document.addEventListener("keyup", this._handleKeyPress.bind(this));
-        
+
     }
 
 
@@ -186,7 +186,7 @@ class Game extends React.Component {
     handleRowClick(row) {
 
         // Is it your turn?
-        if(!this.yourTurn()){
+        if (!this.yourTurn()) {
             return;
         }
 
@@ -282,8 +282,8 @@ class Game extends React.Component {
 
     yourTurn() {
         return (
-            this.state.playerId == 1 && this.state.isPlayer1Turn ||
-            this.state.playerId == 2 && !this.state.isPlayer1Turn
+            (this.state.playerId === 1 && this.state.isPlayer1Turn) ||
+            (this.state.playerId === 2 && !this.state.isPlayer1Turn)
         );
     }
 
@@ -376,7 +376,12 @@ class Game extends React.Component {
                 status = "תיקו יא חביבי";
             }
             else {
-                status = <span>יאללה <span style={style}>{this.state.players[this.state.isPlayer1Turn ? 0 : 1].name}</span>, תורך</span>
+                if (this.yourTurn()) {
+                    status = <span>יאללה חביבי, תורך!</span>;
+                }
+                else {
+                    status = <span>תור היריב</span>;
+                }
             }
         }
         else {
@@ -403,8 +408,11 @@ class Game extends React.Component {
                                 roomId={this.state.roomId}
                             />
                             <Switch>
-                                <Route exact path='/game/:id' component={() => this.renderBoard()} />
-                                <Route path='/game/:id/results' component={() => <ResultsTable table={this.state.resultsTable} />} />
+                                <Route exact path={`/game/${this.state.roomId}`} component={
+                                    () => {
+                                        return this.renderBoard();
+                                    }} />
+                                <Route path={`/game/${this.state.roomId}/results`} component={() => <ResultsTable table={this.state.resultsTable} />} />
                             </Switch>
 
                         </div>

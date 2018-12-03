@@ -32,7 +32,6 @@ class GameHeader extends React.Component {
                                 )}
                             />
                             <Route
-                                
                                 path={`/game/${this.state.props.roomId}/results`}
                                 render={() => (
                                     <Link to={`/game/${this.state.props.roomId}`} key="1">
@@ -44,9 +43,9 @@ class GameHeader extends React.Component {
                             />
 
                         </Switch>
-                        <button id="startNewGame" onClick={this.state.props.handleStartNewGame} className="btn-success" key="1">
+                        {/* <button id="startNewGame" onClick={this.state.props.handleStartNewGame} className="btn-success" key="1">
                             התחל משחק חדש
-                        </button>
+                        </button> */}
                     </div>
                 </div>
             </div>

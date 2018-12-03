@@ -51,6 +51,7 @@ io.on('connection', (client) => {
 
         let response;
         let ret = false;
+        let warning;
         // The room with this ID is already active
         if (rooms[roomId].players.length === 2) {
             response = { error: "The players in this room are playing right now." };
@@ -66,26 +67,44 @@ io.on('connection', (client) => {
         if (!ret) {
             // Add player to players list
             if (rooms[roomId].players.find((ele) => ele === newPlayer) === undefined) {
-                console.log("Player has been joined to room", roomId, ":", newPlayer);
-                rooms[roomId].players.push(newPlayer);
+
+                // Check colors equality
+                if (rooms[roomId].players.find((ele) => ele.color == newPlayer.color) !== undefined) {
+                    // Same color
+                    // Return warning
+                    console.log("Player tried to join to ", roomId,"but with same color");
+                    warning = true;
+                    response = {
+                        warning: "same color"
+                    };
+                }
+                else {
+                    // All is ok
+                    // Add new player to room's players array
+                    console.log("Player has been joined to room", roomId, ":", newPlayer);
+                    rooms[roomId].players.push(newPlayer);
+                }
             }
 
-            // 2 players are here, game is ready
-            if (rooms[roomId].players.length === 2) {
-                const roomData = createRoomData(rooms[roomId].players);
-                console.log("Game is ready! Here's the data:", roomData);
-                response = {
-                    roomData: roomData
-                };
-                rooms[roomId].data = roomData;
-            }
-            else {
-                // Unknown error
-                response = { error: "Unknown error." };
+            if (!warning) {
+                // 2 players are here, game is ready
+                if (rooms[roomId].players.length === 2) {
+                    const roomData = createRoomData(rooms[roomId].players);
+                    console.log("Game is ready! Here's the data:", roomData);
+                    response = {
+                        roomData: roomData
+                    };
+                    rooms[roomId].data = roomData;
+                }
+                else {
+                    // Unknown error
+                    response = { error: "Unknown error." };
+                }
             }
 
 
         }
+
         setTimeout(() => {
             io.emit("startGame", response);
         }, 1000);

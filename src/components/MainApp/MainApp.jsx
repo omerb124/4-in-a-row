@@ -23,6 +23,7 @@ class MainApp extends React.Component {
                     <Switch>
                         <Route exact path='/' component={StartPage} />
                         <Route exact path='/game/:id' component={Game} />
+                        <Route path='/game/:id/results' component={Game} />
                         <Route path='/game/:id/join' component={JoinGamePage} />
                         <Route path='/game/:id/wait' component={CreateGameWaitPage} />
                         <Route path='/about' component={AboutPage} />

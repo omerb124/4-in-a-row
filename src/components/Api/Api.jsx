@@ -1,5 +1,5 @@
 import openSocket from 'socket.io-client';
-const socket = openSocket('http://localhost:5000');
+const socket = openSocket('http://89.139.198.130:5000');
 
 function getRoomData(cb) {
     socket.on('retRoomData', (v) => {
@@ -26,7 +26,7 @@ function joinRoom(player,roomId, cb) {
     socket.on('startGame', (v) => {
         cb(null, v);
     });
-    socket.emit('joinRoom', player,roomId);
+    socket.emit('joinRoom', roomId,player);
 }
 
 function doTurn(roomId,playerId,newBoard){

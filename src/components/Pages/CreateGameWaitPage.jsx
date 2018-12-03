@@ -36,7 +36,7 @@ class CreateGameWaitPage extends React.Component {
     componentDidMount() {
         console.log("HEY");
         waitForGameToStart((err, response) => {
-            if (!response.error) {
+            if (!response.error && !response.warning) {
                 this.setState({
                     redirectToGame: true,
                     roomData: response.roomData,

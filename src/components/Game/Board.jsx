@@ -6,6 +6,7 @@ class Board extends React.Component {
 
     render() {
         let table = [];
+        let squareClass = {};
         for (let i = 0; i < this.props.width; i++) {
             let line = [];
             for (let j = 0; j < this.props.height; j++) {
