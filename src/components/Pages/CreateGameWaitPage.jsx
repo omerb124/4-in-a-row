@@ -78,7 +78,8 @@ class CreateGameWaitPage extends React.Component {
         };
         const inputStyle = {
             border: 0,
-            width: "50%"
+            width: "100%",
+            textAlign: "left"
         };
         const more = <div className="form-group" style={divStyle}>
             <label htmlFor="inviteUrl">קישור הזמנה:</label>

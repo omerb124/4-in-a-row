@@ -28,7 +28,7 @@ class JoinGamePage extends React.Component {
             color: this.color.current.value
         });
 
-        console.log(this.state.color);
+        //console.log(this.state.color);
     }
 
     handleJoiningRoom() {
@@ -38,6 +38,7 @@ class JoinGamePage extends React.Component {
         };
         const roomId = this.props.match.params.id;
         joinRoom(playerSettings, roomId, (err, response) => {
+
             if (!response.error && !response.warning) {
                 // Success
                 this.setState({
@@ -48,9 +49,7 @@ class JoinGamePage extends React.Component {
             }
             else if(response.warning){
                 // Same color as first player
-                if(response.warning === "same color"){
-                    alert("בחרת צבע זהה לשחקן הראשון. בוא ננסה להיות יצירתיים?");
-                }
+                alert(response.warning);
             }
             else {
                 // Error

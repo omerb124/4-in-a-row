@@ -24,6 +24,7 @@ function waitForGameToStart(cb){
 
 function joinRoom(player,roomId, cb) {
     socket.on('startGame', (v) => {
+        console.log(v);
         cb(null, v);
     });
     socket.emit('joinRoom', roomId,player);

@@ -16,7 +16,7 @@ class Board extends React.Component {
                 let activeRow = j === this.props.activeRow;
 
                 // Paint active rows
-                if (activeRow && this.props.myTurn) {
+                if (activeRow && this.props.myTurn && !this.props.gameEnded) {
                     color = this.props.activeRowColor;
                 }
 
@@ -40,8 +40,15 @@ class Board extends React.Component {
             table.push(<div className="board-row" key={i}>{line}</div>);
         }
         return (
-            <div id="table" className="mx-auto">
+            <div id="tableContainer" className="mx-auto">
+                <div id="table">
                 {table}
+                </div>
+                {(this.props.gameEnded === false && this.props.status) &&
+                    <div id="statusMessage">
+                        {this.props.status}
+                    </div>
+                }
             </div>
         );
     }

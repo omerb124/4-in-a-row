@@ -16,11 +16,12 @@ class Game extends React.Component {
         // Settings
         this.width = 9;
         this.height = 9;
-        this.activeRowColor = "#ecf0f1"; // Active row color
+        this.activeRowColor = "wheat"; // Active row color
 
         try {
             // Getting props from previous component
             const roomData = this.props.location.state.roomData;
+            console.log(roomData);
             this.state = {
                 turn: true,
                 roomId: this.props.match.params.id,
@@ -30,7 +31,8 @@ class Game extends React.Component {
                 playerId: this.props.location.state.playerId,
                 activeRow: 4,
                 currentTurn: 1,
-                resultsTable: []
+                resultsTable: [],
+                gameEnded: false
             };
         } catch (e) {
             // No props were passed
@@ -84,7 +86,7 @@ class Game extends React.Component {
                 board: response.updatedData.board,
                 isPlayer1Turn: response.updatedData.turn
             });
-            console.log("Game has been updated");
+            console.log("Game has been updated!");
         }
     }
 
@@ -204,11 +206,11 @@ class Game extends React.Component {
         }
 
         // Create the new row
-        const newRow = Object.assign({}, this.state.board[emptySpotId]);
+        const newRow = Object.assign([], this.state.board[emptySpotId]);
         newRow[row] = this.state.isPlayer1Turn ? "0" : "1";
 
         // Create new board
-        const newBoard = Object.assign({}, this.state.board);
+        const newBoard = Object.assign([], this.state.board);
         newBoard[emptySpotId] = newRow;
 
         // 1. Update new board
@@ -336,13 +338,16 @@ class Game extends React.Component {
     }
 
     // Rendering board
-    renderBoard() {
+    renderBoard(status) {
+        console.log("Bobo" + this.state.gameEnded);
         return (
             <Board
                 players={this.state.players}
                 myTurn={this.yourTurn()}
                 activeRow={this.state.activeRow}
                 activeRowColor={this.activeRowColor}
+                gameEnded={this.state.gameEnded}
+                status={status}
                 width="9"
                 height="9"
                 board={this.state.board}
@@ -387,6 +392,14 @@ class Game extends React.Component {
         else {
             // Add Winning to results table
             this.addGameResult(winner);
+
+            if (!this.state.gameEnded) {
+                // Set gameEnded as true
+                this.setState({
+                    gameEnded: true
+                });
+            }
+
             status = <span>המנצח הוא <span style={{ color: this.state.players[winner].color }}>{winner === "0" ? this.state.players[0].name : this.state.players[1].name}</span></span>
         }
         return status;
@@ -410,7 +423,7 @@ class Game extends React.Component {
                             <Switch>
                                 <Route exact path={`/game/${this.state.roomId}`} component={
                                     () => {
-                                        return this.renderBoard();
+                                        return this.renderBoard(status);
                                     }} />
                                 <Route path={`/game/${this.state.roomId}/results`} component={() => <ResultsTable table={this.state.resultsTable} />} />
                             </Switch>
