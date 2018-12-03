@@ -43,12 +43,13 @@ class Board extends React.Component {
             <div id="tableContainer" className="mx-auto">
                 <div id="table">
                 {table}
-                </div>
-                {(this.props.gameEnded === false && this.props.status) &&
+                {(this.props.gameEnded === true && this.props.status) &&
                     <div id="statusMessage">
                         {this.props.status}
                     </div>
                 }
+                </div>
+                
             </div>
         );
     }

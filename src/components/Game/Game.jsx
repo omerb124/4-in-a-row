@@ -400,7 +400,14 @@ class Game extends React.Component {
                 });
             }
 
-            status = <span>המנצח הוא <span style={{ color: this.state.players[winner].color }}>{winner === "0" ? this.state.players[0].name : this.state.players[1].name}</span></span>
+            let statusString;
+            if(winner == this.playerId){
+                statusString = "חמודי, ניצחת!";
+            }
+            else{
+                statusString = "חחח אפס, הפסדת!";
+            }
+            status = <span>{statusString}</span>;
         }
         return status;
     }
