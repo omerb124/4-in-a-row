@@ -8,6 +8,7 @@ import CreateGamePage from '../Pages/CreateGamePage.jsx';
 import NotFoundPage from '../Pages/NotFoundPage.jsx';
 import CreateGameWaitPage from '../Pages/CreateGameWaitPage.jsx';
 import JoinGamePage from '../Pages/JoinGamePage.jsx';
+import ViewGamePage from '../Pages/ViewGamePage.jsx';
 
 import './MainApp.css';
 
@@ -25,6 +26,7 @@ class MainApp extends React.Component {
                         <Route exact path='/game/:id' component={Game} />
                         <Route path='/game/:id/results' component={Game} />
                         <Route path='/game/:id/join' component={JoinGamePage} />
+                        <Route path='/game/:id/view' component={ViewGamePage} />
                         <Route path='/game/:id/wait' component={CreateGameWaitPage} />
                         <Route path='/about' component={AboutPage} />
                         <Route path='/create' component={CreateGamePage} />

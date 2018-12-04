@@ -63,7 +63,9 @@ class JoinGamePage extends React.Component {
             this.state.name &&
             this.state.name.length > 0 &&
             this.state.color &&
-            this.state.color.length > 0
+            this.state.color.length > 0 &&
+            this.state.color !== "#ffffff" &&
+            this.state.color !== "#fff"
         );
     }
 

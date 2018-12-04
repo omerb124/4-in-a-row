@@ -9,38 +9,45 @@ class GameHeader extends React.Component {
         super(props);
 
         this.state = {
-            props : props
+            props: props
         };
     }
 
+    
 
     getBtnsMenu() {
+        let previousUrl = "/game/" + this.state.props.roomId;
+        if(this.props.viewer){
+            previousUrl += "/view";
+        }
+
         return (
             <div className="container-fluid">
                 <div className="row">
                     <div className="mx-auto">
                         <Switch>
                             <Route
-                                exact
-                                path={`/game/${this.state.props.roomId}`}
+                                path={previousUrl + "/results"}
                                 render={() => (
-                                    <Link to={`/game/${this.state.props.roomId}/results`} key="1">
-                                        <button id="watchResultsTable" className="btn-success" key="1">
-                                            צפה בלוח תוצאות
-                                        </button>
-                                    </Link>
-                                )}
-                            />
-                            <Route
-                                path={`/game/${this.state.props.roomId}/results`}
-                                render={() => (
-                                    <Link to={`/game/${this.state.props.roomId}`} key="1">
+                                    <Link to={previousUrl} key="1">
                                         <button id="watchResultsTable" className="btn-success" key="1">
                                             חזור למשחק
                                         </button>
                                     </Link>
                                 )}
                             />
+                            <Route
+
+                                path={previousUrl}
+                                render={() => (
+                                    <Link to={previousUrl + "/results"} key="1">
+                                        <button id="watchResultsTable" className="btn-success" key="1">
+                                            צפה בלוח תוצאות
+                                        </button>
+                                    </Link>
+                                )}
+                            />
+
 
                         </Switch>
                         {/* <button id="startNewGame" onClick={this.state.props.handleStartNewGame} className="btn-success" key="1">

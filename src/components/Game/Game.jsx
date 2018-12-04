@@ -88,6 +88,9 @@ class Game extends React.Component {
             });
             console.log("Game has been updated!");
         }
+        else{
+            console.log("Error has been occured during game update: " + response);
+        }
     }
 
     // Will mount
@@ -401,7 +404,7 @@ class Game extends React.Component {
             }
 
             let statusString;
-            if(winner == this.playerId){
+            if(winner === this.state.playerId.toString()){
                 statusString = "חמודי, ניצחת!";
             }
             else{
