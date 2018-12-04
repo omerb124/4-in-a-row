@@ -24,35 +24,61 @@ class ViewGamePage extends React.Component {
     }
 
     handleGameUpdate(err, response) {
-        if (response.updatedData) {
-            this.setState({
-                board: response.updatedData.board,
-                currentTurn: response.updatedData.turn
-            });
+
+        switch (response.status) {
+            case 200:
+                // Success
+                this.setState({
+                    board: response.data.board,
+                    currentTurn: response.data.turn
+                });
+                break;
+            case 400:
+            case 404:
+                // Error
+                console.log("Error:", response.data);
+                break;
+            case 500:
+                // Server Error
+                console.log("Server Error:", response.data);
+                break;
+            default:
+                console.log("Error has been occured");
+                break;
         }
     }
 
     handleRoomData(err, response) {
         console.log(response);
-        if (response.status === 200 && response.data) {
-            // Success
-            this.setState({
-                board: response.data.board,
-                players: response.data.players,
-                currentTurn: response.data.turn,
-                roomId: response.data.id
-            });
+
+        switch (response.status) {
+            case 200:
+                // Success
+                this.setState({
+                    board: response.data.board,
+                    players: response.data.players,
+                    currentTurn: response.data.turn,
+                    roomId: response.data.id
+                });
+                break;
+            case 202:
+                // Wait for game to start
+                // TODO: handle startGame here OMER !!!!
+                break;
+            case 400:
+            case 404:
+                // Error: room id not found or not valid
+                this.setState({ roomNotFound: true });
+                console.log("Error:", response.data);
+                break;
+            case 500:
+                // Server Error
+                console.log("Server Error:", response.data);
+                break;
+            default:
+                console.log("Error has been occured");
+                break;
         }
-        else if (response.status === 202) {
-            // Warning
-            this.setState({ roomNotFound: true });
-        }
-        else {
-            // Error
-            console.log("Error has been occured during handling room data");
-            this.setState({ roomNotFound: true });
-        }
-        
     }
 
     componentWillMount() {

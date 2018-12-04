@@ -39,21 +39,31 @@ class JoinGamePage extends React.Component {
         const roomId = this.props.match.params.id;
         joinRoom(playerSettings, roomId, (err, response) => {
 
-            if (!response.error && !response.warning) {
-                // Success
-                this.setState({
-                    redirectToGame: true,
-                    roomData: response.roomData,
-                    playerId: 2
-                });
-            }
-            else if(response.warning){
-                // Same color as first player
-                alert(response.warning);
-            }
-            else {
-                // Error
-                console.log("Error:", response.error);
+            switch (response.status) {
+                case 200:
+                    // Success
+                    this.setState({
+                        redirectToGame: true,
+                        roomData: response.data,
+                        playerId: 2
+                    });
+                    break;
+                case 409:
+                    // Same color as first player or game is progress
+                    alert(response.data);
+                    break;
+                case 400:
+                case 404:
+                    // Error
+                    console.log("Error:", response.data);
+                    break;
+                case 500:
+                    // Server Error
+                    console.log("Server Error:", response.data);
+                    break;
+                default:
+                    console.log("Error has been occured");
+                    break;
             }
         });
     }

@@ -36,17 +36,24 @@ class CreateGameWaitPage extends React.Component {
     componentDidMount() {
         console.log("HEY");
         waitForGameToStart((err, response) => {
-            if (!response.error && !response.warning) {
-                this.setState({
-                    redirectToGame: true,
-                    roomData: response.roomData,
-                    playerId: 1
-                });
+
+            switch (response.status) {
+                case 200:
+                    // Success
+                    this.setState({
+                        redirectToGame: true,
+                        roomData: response.data,
+                        playerId: 1
+                    });
+                    break;
+                case 500:
+                    // Error
+                    console.log("Server Error:", response.data);
+                    break;
+                default:
+                    console.log("Error has been occured");
+                    break;
             }
-            else {
-                console.log("Error:", response.error);
-            }
-            console.log("HEY, I WAS HERE");
         });
     }
 

@@ -53,18 +53,26 @@ class CreateGamePage extends React.Component {
             color: this.state.color,
             name: this.state.name
         };
-        createRoom(playerSettings,  (err, v) => {
-            if (v.roomId) {
-                this.setState(
-                    {
-                        playerSettings: playerSettings,
-                        roomId: v.roomId,
-                        toGamePage: true
-                    }
-                );
-            }
-            else {
-                console.log("Error has been occured");
+        createRoom(playerSettings,  (err, response) => {
+
+            switch (response.status) {
+                case 200:
+                    // Success
+                    this.setState(
+                        {
+                            playerSettings: playerSettings,
+                            roomId: response.data,
+                            toGamePage: true
+                        }
+                    );
+                    break;
+                case 500:
+                    // Server Error
+                    console.log("Server Error:", response.data);
+                    break;
+                default:
+                    console.log("Error has been occured");
+                    break;
             }
         });
     }
