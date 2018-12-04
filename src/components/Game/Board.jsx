@@ -6,6 +6,7 @@ class Board extends React.Component {
 
     render() {
         let table = [];
+        let squareClass = {};
         for (let i = 0; i < this.props.width; i++) {
             let line = [];
             for (let j = 0; j < this.props.height; j++) {
@@ -15,7 +16,7 @@ class Board extends React.Component {
                 let activeRow = j === this.props.activeRow;
 
                 // Paint active rows
-                if (activeRow) {
+                if (activeRow && this.props.myTurn && !this.props.gameEnded) {
                     color = this.props.activeRowColor;
                 }
 
@@ -32,7 +33,6 @@ class Board extends React.Component {
                         row={j}
                         line={i}
                         color={color}
-                        activeRow={j === this.props.activeRow}
                     //onClick={(row) => this.handleRowClick(row)}
                     />
                 );
@@ -40,8 +40,16 @@ class Board extends React.Component {
             table.push(<div className="board-row" key={i}>{line}</div>);
         }
         return (
-            <div id="table" className="mx-auto">
+            <div id="tableContainer" className="mx-auto">
+                <div id="table">
                 {table}
+                {(this.props.gameEnded === true && this.props.status) &&
+                    <div id="statusMessage">
+                        {this.props.status}
+                    </div>
+                }
+                </div>
+                
             </div>
         );
     }

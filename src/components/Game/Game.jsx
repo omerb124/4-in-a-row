@@ -5,6 +5,7 @@ import { Switch, Route, Link, Redirect } from 'react-router-dom';
 import Board from './Board.jsx';
 import ResultsTable from './ResultsTable.jsx';
 import GameHeader from './GameHeader.jsx';
+import { getUpdate, doTurn } from '../Api/Api.jsx';
 
 // Whole game component
 class Game extends React.Component {
@@ -13,36 +14,44 @@ class Game extends React.Component {
         super(props);
 
         // Settings
-        this.width = 9; // Lines amount
-        this.height = 9; // Rows amount
-        this.activeRowColor = "#ecf0f1"; // Active row color
+        this.width = 9;
+        this.height = 9;
+        this.activeRowColor = "wheat"; // Active row color
 
-        // // Players
-        // if (!this.state.players) {
-        //     this.state.players = [];
-        //     this.state.players[0] = {
-        //         color: "#f1c40f",
-        //         name: "שחקן 1"
-        //     };
-        //     this.state.players[1] = {
-        //         color: "#e74c3c",
-        //         name: "שחקן 2"
-        //     };
-        // }
+        try {
+            // Getting props from previous component
+            const roomData = this.props.location.state.roomData;
+            console.log(roomData);
+            this.state = {
+                turn: true,
+                roomId: this.props.match.params.id,
+                board: roomData.board,
+                players: roomData.players,
+                isPlayer1Turn: roomData.turn,
+                playerId: this.props.location.state.playerId,
+                activeRow: 4,
+                currentTurn: 1,
+                resultsTable: [],
+                gameEnded: false
+            };
+        } catch (e) {
+            // No props were passed
+            this.state = {
+                notFound: true
+            };
+        }
 
 
-        this.state = {
-            // Turn changer
-            isPlayer1Turn: true,
-            board: this.createBoard(),
-            activeRow: Math.round((this.width - 1) / 2),
-            currentTurn: 1,
-            resultsTable: []
-        };
+        this.handleGameUpdate = this.handleGameUpdate.bind(this);
+        getUpdate(this.handleGameUpdate);
+
+        console.log(this.props.location);
+
 
         this.handleRowClick = this.handleRowClick.bind(this);
         this.findEmptySpot = this.findEmptySpot.bind(this);
         this.handleStartNewGame = this.handleStartNewGame.bind(this);
+
         //this.handleGameStatus = this.handleGameStatus.bind(this);
 
     }
@@ -69,6 +78,27 @@ class Game extends React.Component {
 
 
     }
+
+    // Handle game update
+    handleGameUpdate(err, response) {
+        if (response.updatedData) {
+            this.setState({
+                board: response.updatedData.board,
+                isPlayer1Turn: response.updatedData.turn
+            });
+            console.log("Game has been updated!");
+        }
+        else{
+            console.log("Error has been occured during game update: " + response);
+        }
+    }
+
+    // Will mount
+    componentWillMount() {
+        document.addEventListener("keyup", this._handleKeyPress.bind(this));
+
+    }
+
 
     // Handling request for start a new game
     handleStartNewGame() {
@@ -160,6 +190,11 @@ class Game extends React.Component {
     // Handling click on square
     handleRowClick(row) {
 
+        // Is it your turn?
+        if (!this.yourTurn()) {
+            return;
+        }
+
         // Update winner
         if (this.checkWinner() !== false || this.checkBoardFullness() !== false) {
             return;
@@ -174,19 +209,24 @@ class Game extends React.Component {
         }
 
         // Create the new row
-        const newRow = Object.assign({}, this.state.board[emptySpotId]);
+        const newRow = Object.assign([], this.state.board[emptySpotId]);
         newRow[row] = this.state.isPlayer1Turn ? "0" : "1";
 
         // Create new board
-        const newBoard = Object.assign({}, this.state.board);
+        const newBoard = Object.assign([], this.state.board);
         newBoard[emptySpotId] = newRow;
 
         // 1. Update new board
         // 2. Change turn
         // 3. Change currentTurn to next turn
+
+        doTurn(
+            this.state.roomId,
+            this.state.playerId,
+            newBoard
+        );
+
         this.setState({
-            board: newBoard,
-            isPlayer1Turn: !this.state.isPlayer1Turn,
             currentTurn: this.state.currentTurn + 1
         });
 
@@ -245,8 +285,21 @@ class Game extends React.Component {
         return false;
     }
 
+    yourTurn() {
+        return (
+            (this.state.playerId === 1 && this.state.isPlayer1Turn) ||
+            (this.state.playerId === 2 && !this.state.isPlayer1Turn)
+        );
+    }
+
     // Handling keypress
     _handleKeyPress(e) {
+
+        // Validate that the turn is yours
+        if (!this.yourTurn()) {
+            console.log(this.state.playerId);
+            return false;
+        }
 
         // If there is a winner || full board, key won't change anything
         if (this.checkWinner() || this.checkBoardFullness()) {
@@ -282,42 +335,24 @@ class Game extends React.Component {
         }
     }
 
-    // component will mount
-    componentWillMount() {
-        let players;
-        if (this.props.location.params) {
-            players = [];
-            players.push({ name: this.props.location.params.name1, color: this.props.location.params.color1 });
-            players.push({ name: this.props.location.params.name2, color: this.props.location.params.color2 });
+    // component did mount
+    componentDidMount() {
 
-
-
-
-        }
-        else {
-            players = [
-                { name: "gggg", color: "black" },
-                { name: "bbbb", color: "#ffffff" }
-            ];
-        }
-        this.setState(
-            {
-                players: players
-            }
-        );
-
-        document.addEventListener("keyup", this._handleKeyPress.bind(this));
     }
 
     // Rendering board
-    renderBoard() {
+    renderBoard(status) {
+        console.log("Bobo" + this.state.gameEnded);
         return (
             <Board
                 players={this.state.players}
+                myTurn={this.yourTurn()}
                 activeRow={this.state.activeRow}
                 activeRowColor={this.activeRowColor}
-                width={this.width}
-                height={this.height}
+                gameEnded={this.state.gameEnded}
+                status={status}
+                width="9"
+                height="9"
                 board={this.state.board}
             />
         )
@@ -334,19 +369,6 @@ class Game extends React.Component {
     //     return status;
     // }
 
-    // Validate that the room is available to join
-    validateRoomId() {
-        let roomId;
-        if(this.props.match.params.id){
-            roomId = this.props.match.params.id;
-            return roomId;
-        }
-        else{
-            console.log(this.props.match);
-            return false;
-        }
-    }
-
     handleGameStatus() {
 
         let status;
@@ -362,25 +384,38 @@ class Game extends React.Component {
                 status = "תיקו יא חביבי";
             }
             else {
-                status = <span>התור של <span style={style}>{this.state.isPlayer1Turn ? this.state.players[0].name : this.state.players[1].name}</span></span>
+                if (this.yourTurn()) {
+                    status = <span>יאללה חביבי, תורך!</span>;
+                }
+                else {
+                    status = <span>תור היריב</span>;
+                }
             }
         }
         else {
             // Add Winning to results table
             this.addGameResult(winner);
-            status = <span>המנצח הוא <span style={{ color: this.state.players[winner].color }}>{winner === "0" ? this.state.players[0].name : this.state.players[1].name}</span></span>
+
+            if (!this.state.gameEnded) {
+                // Set gameEnded as true
+                this.setState({
+                    gameEnded: true
+                });
+            }
+
+            let statusString;
+            if(winner === this.state.playerId.toString()){
+                statusString = "חמודי, ניצחת!";
+            }
+            else{
+                statusString = "חחח אפס, הפסדת!";
+            }
+            status = <span>{statusString}</span>;
         }
         return status;
     }
 
     render() {
-        let roomId = this.validateRoomId();
-        if(!roomId){
-            return (<Redirect to="/roomNotFound" />);
-        }
-
-        console.log(roomId);
-
         // Handling game status
         let status = this.handleGameStatus();
 
@@ -393,11 +428,14 @@ class Game extends React.Component {
                             <GameHeader
                                 status={status}
                                 handleStartNewGame={this.handleStartNewGame}
-                                roomId={roomId}
+                                roomId={this.state.roomId}
                             />
                             <Switch>
-                                <Route exact path='/game/:id' component={() => this.renderBoard()} />
-                                <Route path='/game/:id/results' component={() => <ResultsTable table={this.state.resultsTable} />} />
+                                <Route exact path={`/game/${this.state.roomId}`} component={
+                                    () => {
+                                        return this.renderBoard(status);
+                                    }} />
+                                <Route path={`/game/${this.state.roomId}/results`} component={() => <ResultsTable table={this.state.resultsTable} />} />
                             </Switch>
 
                         </div>

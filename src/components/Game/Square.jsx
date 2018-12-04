@@ -9,10 +9,11 @@ class Square extends React.Component {
         const style = {
             backgroundColor: this.props.color
         };
+        const classString = "square";
 
         return (
             <button
-                className="square"
+                className={classString}
                 style={style}
             >
             </button>

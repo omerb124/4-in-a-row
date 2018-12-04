@@ -1,17 +1,17 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import './CreateGamePage.css';
 import NiceBox from '../Utils/NiceBox.jsx';
+import {createRoom} from '../Api/Api.jsx';
+
 
 class CreateGamePage extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            name1: null,
-            name2: null,
-            color1: null,
-            color2: null
+            name: null,
+            color: null,
         };
 
         // // Default
@@ -20,27 +20,11 @@ class CreateGamePage extends React.Component {
         // this._color1 = "#f1c40f";
         // this._color2 = "#e74c3c";
 
-        this.name1 = React.createRef();
-        this.name2 = React.createRef();
-        this.color1 = React.createRef();
-        this.color2 = React.createRef();
+        this.name = React.createRef();
+        this.color = React.createRef();
 
-        //this.handleChange = this.handleChange.bind(this);
-        this.getLinkObject = this.getLinkObject.bind(this);
-        this.generateRoomId = this.generateRoomId.bind(this);
-    }
-
-    generateRoomId(){
-        let L = 10; // ID Length
-        let s = '';
-        let randomchar = function() {
-            let n = Math.floor(Math.random() * 62);
-            if (n < 10) return n; //1-10
-            if (n < 36) return String.fromCharCode(n + 55); //A-Z
-            return String.fromCharCode(n + 61); //a-z
-        }
-        while (s.length < L) s += randomchar();
-        return s;
+        this.handleChange = this.handleChange.bind(this);
+        this.handleCreateRoom = this.handleCreateRoom.bind(this);
     }
 
     // Validate that the whole params are ok
@@ -51,38 +35,45 @@ class CreateGamePage extends React.Component {
         return valid;
     }
 
-    getLinkObject() {
-        const roomId = this.generateRoomId();
-        return {
-            'pathname': '/game/' + roomId,
-            'roomId' : roomId,
-            'params': this.state
-        };
-    }
-
     componentDidMount() {
-        console.log(this.name1);
         const a = [...document.getElementsByTagName("input")];
 
         a.forEach((v) => v.addEventListener('keyup', () => this.handleChange()));
 
         this.setState({
-            color1: this.color1.current.value,
-            color2: this.color2.current.value,
-            name1: this.name1.current.value,
-            name2: this.name2.current.value
+            color: this.color.current.value,
+            name: this.name.current.value
         });
 
 
     }
 
+    handleCreateRoom() {
+        const playerSettings = {
+            color: this.state.color,
+            name: this.state.name
+        };
+        createRoom(playerSettings,  (err, v) => {
+            if (v.roomId) {
+                this.setState(
+                    {
+                        playerSettings: playerSettings,
+                        roomId: v.roomId,
+                        toGamePage: true
+                    }
+                );
+            }
+            else {
+                console.log("Error has been occured");
+            }
+        });
+    }
+
     handleChange() {
 
         this.setState({
-            color1: this.color1.current.value,
-            color2: this.color2.current.value,
-            name1: this.name1.current.value,
-            name2: this.name2.current.value
+            color: this.color.current.value,
+            name: this.name.current.value
         });
         this.forceUpdate();
     }
@@ -104,41 +95,38 @@ class CreateGamePage extends React.Component {
         const form = <div id="settingsForm" style={style}>
             <div id="form">
                 <div className="form-group row">
-                    <label htmlFor="player1_name" className="text-center col-3 col-form-label">שם שחקן 1</label>
+                    <label htmlFor="player1_name" className="text-center col-3 col-form-label">שם שחקן</label>
                     <div className="col-6">
-                        <input className="form-control" required type="text" placeholder=" הזן שם..." id="playerOneName" ref={this.name1} />
+                        <input className="form-control" required type="text" placeholder=" הזן שם..." id="playerOneName" ref={this.name} />
                     </div>
                 </div>
                 <div className="form-group row">
-                    <label htmlFor="player1_name" className="text-center col-3 col-form-label">צבע שחקן 1</label>
+                    <label htmlFor="player1_name" className="text-center col-3 col-form-label">צבע שחקן</label>
                     <div className="col-6">
-                        <input className="form-control" style={colorInputStyle} type="color" id="playerOneColor" defaultValue="#f1c40f" list="colors" ref={this.color1} />
-                    </div>
-                </div>
-                <div className="form-group row">
-                    <label htmlFor="player2_name" className="text-center col-3 col-form-label">שם שחקן 2</label>
-                    <div className="col-6">
-                        <input className="form-control" required type="text" placeholder=" הזן שם..." id="playerTwoName" ref={this.name2} />
-                    </div>
-                </div>
-                <div className="form-group row">
-                    <label htmlFor="player1_name" className="text-center col-3 col-form-label">צבע שחקן 2</label>
-                    <div className="col-6">
-                        <input className="form-control" style={colorInputStyle} type="color" id="playerTwoColor" defaultValue="#e74c3c" list="colors" ref={this.color2} />
+                        <input className="form-control" onChange={this.handleChange} style={colorInputStyle} type="color" id="playerOneColor" defaultValue="#f1c40f" list="colors" ref={this.color} />
                     </div>
                 </div>
             </div>
             <div id="actionBtn" className="mx-auto col-12">
                 {
-                    this.validateParams()
-                        ? <Link to={this.getLinkObject()}>
-                            <button className="actionBtn">יאללה בוא נתחיל</button>
-                        </Link>
-                        : <button className="actionBtn" onClick={() => alert("בטוח שמילאת הכל?")}>יאללה בוא נתחיל</button>
+                    this.validateParams() &&
+                    <button className="actionBtn" onClick={this.handleCreateRoom}>יאללה, בוא נפתח חדר</button>
                 }
 
             </div>
         </div >;
+
+        // Navigate to next page if neccessary
+        if (this.state.toGamePage) {
+            return (
+                <Redirect
+                    to={{
+                        pathname: `/game/${this.state.roomId}/wait`,
+                        state: { playerSettings: this.state.playerSettings}
+                    }}
+                />
+            );
+        }
 
         return (
             <NiceBox
