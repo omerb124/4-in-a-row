@@ -5,7 +5,7 @@ import { Switch, Route, Link, Redirect } from 'react-router-dom';
 import Board from './Board.jsx';
 import ResultsTable from './ResultsTable.jsx';
 import GameHeader from './GameHeader.jsx';
-import { getUpdate, doTurn } from '../Api/Api.jsx';
+import { getUpdate, doTurn, updateResultTableByRoomId } from '../Api/Api.jsx';
 
 // Whole game component
 class Game extends React.Component {
@@ -68,12 +68,17 @@ class Game extends React.Component {
             const currentDate = new Date().toLocaleString();
             let newTable = Object.values(Object.assign({}, this.state.resultsTable));
             console.log("NEW TABLE " + newTable);
-            newTable.push({ wonPlayerName: wonPlayerName, currentDate: currentDate });
+            newTable.push([wonPlayerName, currentDate]);
             console.log(newTable);
             this.setState({
                 resultsTable: newTable,
                 resultAdded: true
             });
+
+            // Send new result table to server
+            if(this.state.playerId.toString() === "1"){
+                updateResultTableByRoomId(this.state.roomId,newTable);
+            }
         }
 
 
@@ -81,22 +86,31 @@ class Game extends React.Component {
 
     // Handle game update
     handleGameUpdate(err, response) {
-        if (response.updatedData) {
-            this.setState({
-                board: response.updatedData.board,
-                isPlayer1Turn: response.updatedData.turn
-            });
-            console.log("Game has been updated!");
-        }
-        else{
-            console.log("Error has been occured during game update: " + response);
+        switch(response.status){
+            case 200:
+                this.setState({
+                    board: response.data.board,
+                    isPlayer1Turn: response.data.turn
+                });
+                break;
+            case 400:
+                console.log("Cannot update game: Invalid room id");
+                break;
+            case 404:
+                console.log("Cannot update game: room not found");
+                break;
         }
     }
 
     // Will mount
     componentWillMount() {
+        // Handle keyup event
         document.addEventListener("keyup", this._handleKeyPress.bind(this));
 
+        // Validate that room data has been passed
+        try{
+            const check = this.props.location.state.roomData === undefined;
+        } catch (e) { this.setState({roomNotFound : true}); }
     }
 
 
@@ -416,6 +430,12 @@ class Game extends React.Component {
     }
 
     render() {
+
+        // Handling not found room
+        if(this.state.roomNotFound){
+            return (<Redirect to="/roomNotFound" />);
+        }
+
         // Handling game status
         let status = this.handleGameStatus();
 

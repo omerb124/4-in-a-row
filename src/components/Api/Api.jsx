@@ -51,5 +51,23 @@ function getRoomData(roomId,cb){
 
 /** ************** HTTP ***************/
 
+// Sending a new result table for specific room id
+function updateResultTableByRoomId(roomId){
+    axios.post("http://89.139.198.130:5000" , {
 
-export { getRoomData, createRoom, joinRoom, waitForGameToStart, doTurn, getUpdate };
+    })
+    .then((response) =>  {
+        switch(response.status){
+            case 200:
+                console.log("Results table has been updated successfully");
+                break;
+            default:
+                console.log("An error has been occured during results table update:", response);
+        }
+    })
+    .catch((response) => {
+        console.log("Error has been occured during sending request for updating Results Table:",response);
+    });
+}
+
+export { getRoomData, createRoom, joinRoom, waitForGameToStart, doTurn, getUpdate, updateResultTableByRoomId };

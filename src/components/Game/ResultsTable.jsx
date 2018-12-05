@@ -16,8 +16,8 @@ class ResultsTable extends React.Component {
                 <Result
                     key={index}
                     id={index}
-                    date={value.currentDate}
-                    playerName={value.wonPlayerName}
+                    date={value[1]}
+                    playerName={value[0]}
                 />
             );
         });

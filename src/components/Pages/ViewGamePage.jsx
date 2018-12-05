@@ -1,9 +1,11 @@
 import React from 'react';
 import { Redirect } from 'react-router-dom';
 import axios from 'axios';
-import { getRoomData, getUpdate } from '../Api/Api';
+import { getRoomData, getUpdate, waitForGameToStart } from '../Api/Api';
 import Board from '../Game/Board';
 import GameHeader from '../Game/GameHeader';
+import NiceBox from '../Utils/NiceBox';
+import LoadingPage from '../Pages/LoadingPage.jsx';
 
 // View Page
 class ViewGamePage extends React.Component {
@@ -12,12 +14,7 @@ class ViewGamePage extends React.Component {
         super();
 
 
-        // Default state
-        this.state = {
-            board: Array(9).fill(Array(9).fill("")),
-            players: []
-        };
-
+        this.state = { roomDataRecieved: false };
 
         this.handleRoomData = this.handleRoomData.bind(this);
         this.handleGameUpdate = this.handleGameUpdate.bind(this);
@@ -36,13 +33,16 @@ class ViewGamePage extends React.Component {
             case 400:
             case 404:
                 // Error
+                this.setState({ roomNotFound: true });
                 console.log("Error:", response.data);
                 break;
             case 500:
                 // Server Error
+                this.setState({ roomNotFound: true });
                 console.log("Server Error:", response.data);
                 break;
             default:
+                this.setState({ roomNotFound: true });
                 console.log("Error has been occured");
                 break;
         }
@@ -58,12 +58,39 @@ class ViewGamePage extends React.Component {
                     board: response.data.board,
                     players: response.data.players,
                     currentTurn: response.data.turn,
-                    roomId: response.data.id
+                    roomId: response.data.id,
+                    roomDataRecieved: true
                 });
                 break;
             case 202:
                 // Wait for game to start
-                // TODO: handle startGame here OMER !!!!
+                this.setState({ gameBeforeStart: true });
+                // Listen to 'startGame' event
+                waitForGameToStart((err, response) => {
+                    switch (response.status) {
+                        case 200:
+                            // Success
+                            this.setState({
+                                gameBeforeStart: false,
+                                board: response.data.board,
+                                currentTurn: true,
+                                players: response.data.players,
+                                roomId: this.props.match.params.id
+                            });
+                            break;
+                        case 500:
+                            // Error
+                            this.setState({ roomNotFound: true });
+                            console.log("Server Error:", response.data);
+                            break;
+                        default:
+                            this.setState({ roomNotFound: true });
+                            console.log("Error has been occured");
+                            break;
+                    }
+                });
+
+
                 break;
             case 400:
             case 404:
@@ -73,9 +100,11 @@ class ViewGamePage extends React.Component {
                 break;
             case 500:
                 // Server Error
+                this.setState({ roomNotFound: true });
                 console.log("Server Error:", response.data);
                 break;
             default:
+                this.setState({ roomNotFound: true });
                 console.log("Error has been occured");
                 break;
         }
@@ -113,11 +142,26 @@ class ViewGamePage extends React.Component {
     }
 
     render() {
+        // Room Not Found
         if (this.state.roomNotFound) {
-            // Room Not Found
-            return (<Redirect to="/NotFoundPage" />);
+            return (<Redirect to="/roomNotFound" />);
         }
-        console.log(this.state);
+
+        // Game has not been started yet
+        if (this.state.gameBeforeStart === true) {
+            return (
+                <NiceBox
+                    title="המשחק עוד לא התחיל"
+                    text={<p>מחכים לבחור השני... יאללה נקווה שיזדרז</p>}
+                />
+            );
+        }
+
+        // Be sure that room data is available
+        if (this.state.roomDataRecieved === false) {
+            return (<LoadingPage />);
+        }
+
         const status = <span>
             {
                 this.state.players.length !== 0 &&

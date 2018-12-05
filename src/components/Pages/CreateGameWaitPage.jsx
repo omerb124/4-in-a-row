@@ -36,7 +36,7 @@ class CreateGameWaitPage extends React.Component {
     componentDidMount() {
         console.log("HEY");
         waitForGameToStart((err, response) => {
-
+            console.log(response);
             switch (response.status) {
                 case 200:
                     // Success
