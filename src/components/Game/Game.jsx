@@ -76,8 +76,8 @@ class Game extends React.Component {
             });
 
             // Send new result table to server
-            if(this.state.playerId.toString() === "1"){
-                updateResultTableByRoomId(this.state.roomId,newTable);
+            if (this.state.playerId.toString() === "1") {
+                updateResultTableByRoomId(this.state.roomId, newTable);
             }
         }
 
@@ -86,7 +86,7 @@ class Game extends React.Component {
 
     // Handle game update
     handleGameUpdate(err, response) {
-        switch(response.status){
+        switch (response.status) {
             case 200:
                 this.setState({
                     board: response.data.board,
@@ -108,9 +108,9 @@ class Game extends React.Component {
         document.addEventListener("keyup", this._handleKeyPress.bind(this));
 
         // Validate that room data has been passed
-        try{
+        try {
             const check = this.props.location.state.roomData === undefined;
-        } catch (e) { this.setState({roomNotFound : true}); }
+        } catch (e) { this.setState({ roomNotFound: true }); }
     }
 
 
@@ -418,10 +418,10 @@ class Game extends React.Component {
             }
 
             let statusString;
-            if(winner === this.state.playerId.toString()){
+            if (winner.toString() === "0" && this.state.playerId.toString() === "1") {
                 statusString = "חמודי, ניצחת!";
             }
-            else{
+            else {
                 statusString = "חחח אפס, הפסדת!";
             }
             status = <span>{statusString}</span>;
@@ -432,7 +432,7 @@ class Game extends React.Component {
     render() {
 
         // Handling not found room
-        if(this.state.roomNotFound){
+        if (this.state.roomNotFound) {
             return (<Redirect to="/roomNotFound" />);
         }
 
@@ -457,7 +457,6 @@ class Game extends React.Component {
                                     }} />
                                 <Route path={`/game/${this.state.roomId}/results`} component={() => <ResultsTable table={this.state.resultsTable} />} />
                             </Switch>
-
                         </div>
                     </div>
                 </div>

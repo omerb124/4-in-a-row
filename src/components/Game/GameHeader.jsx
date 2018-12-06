@@ -13,11 +13,11 @@ class GameHeader extends React.Component {
         };
     }
 
-    
+
 
     getBtnsMenu() {
         let previousUrl = "/game/" + this.state.props.roomId;
-        if(this.props.viewer){
+        if (this.props.viewer) {
             previousUrl += "/view";
         }
 
@@ -62,7 +62,10 @@ class GameHeader extends React.Component {
     render() {
         return (
             <div id="gameHeader" className="text-center mx-auto">
-                <h4>{this.props.status}</h4>
+                {
+                    this.props.status &&
+                    <h4>{this.props.status}</h4>
+                }
                 <div id="bottomMenu">
                     {this.getBtnsMenu()}
                 </div>

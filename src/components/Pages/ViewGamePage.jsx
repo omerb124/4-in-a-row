@@ -1,5 +1,6 @@
 import React from 'react';
-import { Redirect } from 'react-router-dom';
+import { Switch, Route, Redirect } from 'react-router-dom';
+import ResultsTable from '../Game/ResultsTable.jsx';
 import axios from 'axios';
 import { getRoomData, getUpdate, waitForGameToStart } from '../Api/Api';
 import Board from '../Game/Board';
@@ -59,6 +60,7 @@ class ViewGamePage extends React.Component {
                     players: response.data.players,
                     currentTurn: response.data.turn,
                     roomId: response.data.id,
+                    resultsTable: response.data.resultsTable,
                     roomDataRecieved: true
                 });
                 break;
@@ -70,11 +72,13 @@ class ViewGamePage extends React.Component {
                     switch (response.status) {
                         case 200:
                             // Success
+                            console.log(response);
                             this.setState({
                                 gameBeforeStart: false,
                                 board: response.data.board,
                                 currentTurn: true,
                                 players: response.data.players,
+                                resultsTable: response.data.resultsTable,
                                 roomId: this.props.match.params.id
                             });
                             break;
@@ -179,11 +183,18 @@ class ViewGamePage extends React.Component {
                     viewer={true}
                 />
                 <div className="row">
-                    {this.renderBoard()}
+                    <div className="mx-auto">
+                        <Switch>
+                            <Route exact path={`/game/${this.state.roomId}/view`} component={() => {
+                                return this.renderBoard();
+                            }} />
+                            <Route path={`/game/${this.state.roomId}/view/results`} component={() => { return <ResultsTable table={this.state.resultsTable} /> }} />
+                        </Switch>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        );
-    }
-}
-
+                );
+            }
+        }
+        
 export default ViewGamePage;
