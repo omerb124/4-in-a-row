@@ -1,0 +1,38 @@
+@200:
+{
+    data: @Object
+    {
+        roomData: @Object
+        {
+            id: room id @string,
+            board: game board @array of @arrayString,
+            players: players settings list @array of @playerSettings
+
+        }
+    },
+    status: 200
+}
+
+@400:
+{
+    data: E("Invalid room id"),
+    status: 400
+}
+
+@404:
+{
+    data: E("Room not found"),
+    status: 404
+}
+
+@409:
+{
+    data: E("Same color"),
+    status: 409
+}
+
+@410:
+{
+    data: E("Game in progress"),
+    status:410
+}
