@@ -255,8 +255,8 @@ class Game extends React.Component {
         doTurn(
             this.state.roomId,
             this.state.playerId,
-            //newBoard,
-            wonBoard,
+            newBoard,
+            //wonBoard,
             gameEnded
         );
 
@@ -452,12 +452,12 @@ class Game extends React.Component {
             let statusString;
             if (winner.toString() === "0" && this.state.playerId.toString() === "1" ||
                 winner.toString() === "1" && this.state.playerId.toString() === "2") {
-                statusString = "חמודי, ניצחת!";
+                statusString = "ניצחת!";
             }
             else {
                 console.log("Winner:", winner.toString());
                 console.log("Player:", this.state.playerId.toString());
-                statusString = "חחח אפס, הפסדת!";
+                statusString = "הפסדת!";
             }
             status = <span>{statusString}</span>;
         }

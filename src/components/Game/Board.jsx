@@ -23,9 +23,12 @@ class Board extends React.Component {
         }
         if (this.props.hasOffer) {
             return (<div>
+                
                 <span>הבחור מציע משחק חדש, מה אומר?</span>
-                <button onClick={() => { this.props.answerOffer(true) }}>כן</button>
-                <button onClick={() => { this.props.answerOffer(false) }}>לא</button>
+                <div id="buttons">
+                <button className="btn m-1 pr-3 pl-3" onClick={() => { this.props.answerOffer(true) }}>כן</button>
+                <button className="btn m-1 pr-3 pl-3" onClick={() => { this.props.answerOffer(false) }}>לא</button>
+                </div>
             </div>
             );
         }
@@ -34,7 +37,7 @@ class Board extends React.Component {
         }
         else {
             // Usual
-            return (<button onClick={this.props.offerNewGame}>בוא שוב!</button>);
+            return (<div>{this.props.status}<br/><button id="offerNewGameBtn" className="btn m-1 pr-3 pl-3" onClick={this.props.offerNewGame}>הצע משחק חדש</button></div>);
         }
     }
 
@@ -78,7 +81,7 @@ class Board extends React.Component {
             table.push(<div className="board-row" key={i}>{line}</div>);
         }
         return (
-            <div id="tableContainer" className="mx-auto">
+            <div id="tableContainer" className="mx-auto mb-4">
                 <div id="table" className={tableClassName}>
                     {table}
 
@@ -86,7 +89,6 @@ class Board extends React.Component {
                 {
                     (this.props.gameEnded === true && this.props.status) &&
                     <div id="statusMessage">
-                        {this.props.status}
                         {
                             (!this.props.viewer) &&
                             <div id="offerAction">{offerButtonAction}</div>
