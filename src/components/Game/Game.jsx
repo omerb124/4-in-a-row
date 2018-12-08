@@ -488,8 +488,6 @@ class Game extends React.Component {
                     this.setState({
                         gameEnded: false,
                         currentTurn: 1,
-                        isPlayer1Turn: true,
-                        turn:true,
                         activeRow: 4,
                         board: this.createBoard(),
                         offeredNewGame: undefined,
