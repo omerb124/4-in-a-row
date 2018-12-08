@@ -58,7 +58,7 @@ class CreateGameWaitPage extends React.Component {
     }
 
     generateInviteUrl() {
-        const url = window.location.host + "/game/" + this.props.match.params.id + "/join";
+        const url = "http://" + window.location.host + "/game/" + this.props.match.params.id + "/join";
         return url;
     }
 
