@@ -5,7 +5,8 @@ import { Switch, Route, Link, Redirect } from 'react-router-dom';
 import Board from './Board.jsx';
 import ResultsTable from './ResultsTable.jsx';
 import GameHeader from './GameHeader.jsx';
-import { getUpdate, doTurn, updateResultTableByRoomId } from '../Api/Api.jsx';
+import { getUpdate, doTurn, updateResultTableByRoomId, listenToNewGameOffer, offerNewGame, answerOffer } from '../Api/Api.jsx';
+import { timingSafeEqual } from 'crypto';
 
 // Whole game component
 class Game extends React.Component {
@@ -51,7 +52,10 @@ class Game extends React.Component {
         this.handleRowClick = this.handleRowClick.bind(this);
         this.findEmptySpot = this.findEmptySpot.bind(this);
         this.handleStartNewGame = this.handleStartNewGame.bind(this);
-
+        this.offerNewGame = this.offerNewGame.bind(this);
+        this.answerOffer = this.answerOffer.bind(this);
+        this.handleOfferResult = this.handleOfferResult.bind(this);
+        this.handleNewGameOffer = this.handleNewGameOffer.bind(this);
         //this.handleGameStatus = this.handleGameStatus.bind(this);
 
     }
@@ -133,7 +137,8 @@ class Game extends React.Component {
             this.setState({
                 board: this.createBoard(),
                 isPlayer1Turn: true,
-                resultAdded: false
+                resultAdded: false,
+                gameEnded: false
             });
         }
     }
@@ -230,14 +235,29 @@ class Game extends React.Component {
         const newBoard = Object.assign([], this.state.board);
         newBoard[emptySpotId] = newRow;
 
+        // Game ended?
+        let gameEnded = false;
+        if (this.checkWinner(newBoard) !== false) {
+            gameEnded = true;
+        }
+
         // 1. Update new board
         // 2. Change turn
         // 3. Change currentTurn to next turn
 
+        // Debugging - sending won board
+        let wonBoard = Array(9).fill(Array(9).fill(""));
+        wonBoard[0][0] = "1";
+        wonBoard[0][1] = "1";
+        wonBoard[0][2] = "1";
+        wonBoard[0][3] = "1";
+
         doTurn(
             this.state.roomId,
             this.state.playerId,
-            newBoard
+            //newBoard,
+            wonBoard,
+            gameEnded
         );
 
         this.setState({
@@ -248,13 +268,13 @@ class Game extends React.Component {
     }
 
     // There is a winner?
-    checkWinner() {
+    checkWinner(givenBoard) {
         // Check rows
         let win = false;
 
         const checkEqual = arr => arr.every(v => (v === arr[0] && v !== ''));
         console.log("CHECK WINNER.");
-        const board = this.state.board;
+        const board = !givenBoard ? this.state.board : givenBoard;
         for (let i = 0; i < this.width; i++) {
 
             for (let j = 0; j < this.height; j++) {
@@ -328,6 +348,7 @@ class Game extends React.Component {
                 e.stopPropagation();
                 newActiveRow = (activeRow + 1) % (this.width);
                 this.setState({
+                    'lastAction': 'navigate',
                     'activeRow': newActiveRow
                 });
                 break;
@@ -336,6 +357,7 @@ class Game extends React.Component {
                 e.stopPropagation();
                 newActiveRow = (activeRow === 0) ? this.width - 1 : activeRow - 1;
                 this.setState({
+                    'lastAction': 'navigate',
                     'activeRow': newActiveRow
                 });
                 break;
@@ -351,9 +373,14 @@ class Game extends React.Component {
 
     // component did mount
     componentDidMount() {
-
+        console.log("Listening to new game offer are active.");
+        listenToNewGameOffer(this.handleNewGameOffer);
     }
 
+    answerOffer(answer){
+        answerOffer(this.state.roomId, answer, this.handleOfferResult);
+    }
+    
     // Rendering board
     renderBoard(status) {
         console.log("Bobo" + this.state.gameEnded);
@@ -368,6 +395,11 @@ class Game extends React.Component {
                 width="9"
                 height="9"
                 board={this.state.board}
+                offerNewGame={this.offerNewGame}
+                hasOffered={this.state.offeredNewGame}
+                hasOffer={this.state.gotNewOffer}
+                answerOffer={this.answerOffer}
+                newGameDeclined={this.state.newGameDeclined}
             />
         )
     }
@@ -418,15 +450,68 @@ class Game extends React.Component {
             }
 
             let statusString;
-            if (winner.toString() === "0" && this.state.playerId.toString() === "1") {
+            if (winner.toString() === "0" && this.state.playerId.toString() === "1" ||
+                winner.toString() === "1" && this.state.playerId.toString() === "2") {
                 statusString = "חמודי, ניצחת!";
             }
             else {
+                console.log("Winner:", winner.toString());
+                console.log("Player:", this.state.playerId.toString());
                 statusString = "חחח אפס, הפסדת!";
             }
             status = <span>{statusString}</span>;
         }
         return status;
+    }
+
+    offerNewGame(){
+        offerNewGame(this.state.roomId,this.handleOfferResult);
+        this.setState({
+            offeredNewGame: true
+        });
+    }
+
+    handleNewGameOffer(err,response){
+        this.setState({
+            gotNewOffer: true
+        });
+        console.log("You got a new game offer!");
+    }
+
+    handleOfferResult(err,response){
+        switch(response.status){
+            case 200:
+                // All good
+                if(response.data === true){
+                    // Accpeted
+                    // Start new game
+                    this.setState({
+                        gameEnded: false,
+                        currentTurn: 1,
+                        isPlayer1Turn: true,
+                        activeRow: 4,
+                        board: this.createBoard(),
+                        offeredNewGame: undefined,
+                        gotNewOffer: undefined,
+                        answerOffer: undefined,
+                        resultAdded: false
+                    });
+                    console.log("New game is about to start!");
+                }
+                else{
+                    // Declined
+                    this.setState({
+                        newGameDeclined: true
+                    });
+                    console.log("No more games for today.");
+                }
+                break;
+            case 500:
+                console.log("Server error:", response.data);
+                break;
+            default:
+                console.log("Cannot handling handleOfferResult response:", response);
+        }
     }
 
     render() {

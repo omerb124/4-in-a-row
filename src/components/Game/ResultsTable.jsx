@@ -27,8 +27,8 @@ class ResultsTable extends React.Component {
                 <thead>
                     <tr>
                         <th scope="col">#</th>
-                        <th scope="col">תאריך</th>
                         <th scope="col">שם מנצח</th>
+                        <th scope="col">תאריך</th>
                     </tr>
                 </thead>
                 <tbody>

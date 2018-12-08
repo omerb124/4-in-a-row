@@ -9,10 +9,18 @@
     direction: ltr;
 }
 
+.blurred{
+    opacity: .5;
+}
+
 #table {
     background-color: #2980b9;
     padding: 10px;
     width: fit-content;
+    
+}
+
+#tableContainer{
     position: relative;
 }
 

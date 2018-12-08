@@ -19,16 +19,18 @@ class ViewGamePage extends React.Component {
 
         this.handleRoomData = this.handleRoomData.bind(this);
         this.handleGameUpdate = this.handleGameUpdate.bind(this);
+        this.getStatus = this.getStatus.bind(this);
     }
 
     handleGameUpdate(err, response) {
-
+        console.log("Game update", response);
         switch (response.status) {
             case 200:
                 // Success
                 this.setState({
                     board: response.data.board,
-                    currentTurn: response.data.turn
+                    currentTurn: response.data.turn,
+                    gameEnded: response.data.gameEnded
                 });
                 break;
             case 400:
@@ -61,7 +63,8 @@ class ViewGamePage extends React.Component {
                     currentTurn: response.data.turn,
                     roomId: response.data.id,
                     resultsTable: response.data.resultsTable,
-                    roomDataRecieved: true
+                    roomDataRecieved: true,
+                    gameEnded: response.data.gameEnded
                 });
                 break;
             case 202:
@@ -129,13 +132,16 @@ class ViewGamePage extends React.Component {
     }
 
     // Rendering board
-    renderBoard() {
+    renderBoard(status) {
         return (
             <Board
                 players={this.state.players}
                 width="9"
                 height="9"
                 board={this.state.board}
+                gameEnded={this.state.gameEnded}
+                status={status}
+                viewer={true}
             />
         )
     }
@@ -143,6 +149,20 @@ class ViewGamePage extends React.Component {
     componentDidMount() {
         // Be aware of game updates
         getUpdate(this.handleGameUpdate);
+    }
+
+    getStatus() {
+        let status;
+        if(this.state.gameEnded){
+            let wonPlayer = this.state.currentTurn ? 1 : 0;
+            status = this.state.players[wonPlayer].name + " ניצח!";
+        }
+        else{
+            let playerTurn = this.state.currentTurn ? 0 : 1;
+            status = "התור של " + this.state.players[playerTurn].name;
+        }
+
+        return <span>{status}</span>;
     }
 
     render() {
@@ -161,19 +181,13 @@ class ViewGamePage extends React.Component {
             );
         }
 
+        console.log("Game ended:", this.state.gameEnded);
+
         // Be sure that room data is available
         if (this.state.roomDataRecieved === false) {
             return (<LoadingPage />);
         }
-
-        const status = <span>
-            {
-                this.state.players.length !== 0 &&
-                (this.state.currentTurn === 1
-                    ? "התור של " + this.state.players[0].name
-                    : "התור של " + this.state.players[1].name)
-            }
-        </span>;
+        const status = this.getStatus();
 
         return (
             <div className="container-fluid">
@@ -186,15 +200,15 @@ class ViewGamePage extends React.Component {
                     <div className="mx-auto">
                         <Switch>
                             <Route exact path={`/game/${this.state.roomId}/view`} component={() => {
-                                return this.renderBoard();
+                                return this.renderBoard(status);
                             }} />
                             <Route path={`/game/${this.state.roomId}/view/results`} component={() => { return <ResultsTable table={this.state.resultsTable} /> }} />
                         </Switch>
-                        </div>
                     </div>
                 </div>
-                );
-            }
-        }
-        
+            </div>
+        );
+    }
+}
+
 export default ViewGamePage;

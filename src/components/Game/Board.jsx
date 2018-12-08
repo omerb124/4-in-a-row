@@ -4,9 +4,47 @@ import './Board.css';
 
 class Board extends React.Component {
 
+    constructor(props) {
+        super(props);
+
+        this.getButtonAction = this.getButtonAction.bind(this);
+
+    }
+
+    getButtonAction() {
+        // New game offer has been declined
+        if(this.props.newGameDeclined){
+            if(this.props.offeredNewGame){
+                return <span>המניאק לא רוצה...</span>;
+            }
+            else{
+                return <span>יאללה תהיה בריא</span>;
+            }
+        }
+        if (this.props.hasOffer) {
+            return (<div>
+                <span>הבחור מציע משחק חדש, מה אומר?</span>
+                <button onClick={() => { this.props.answerOffer(true) }}>כן</button>
+                <button onClick={() => { this.props.answerOffer(false) }}>לא</button>
+            </div>
+            );
+        }
+        else if (this.props.hasOffered) {
+            return (<span>עכשיו מחכים לתשובה...</span>);
+        }
+        else {
+            // Usual
+            return (<button onClick={this.props.offerNewGame}>בוא שוב!</button>);
+        }
+    }
+
     render() {
+        // Action button handling
+        let offerButtonAction = this.getButtonAction();
+
         let table = [];
-        let squareClass = {};
+        let tableClassName = this.props.gameEnded ? "blurred" : "";
+
         for (let i = 0; i < this.props.width; i++) {
             let line = [];
             for (let j = 0; j < this.props.height; j++) {
@@ -41,15 +79,22 @@ class Board extends React.Component {
         }
         return (
             <div id="tableContainer" className="mx-auto">
-                <div id="table">
-                {table}
-                {(this.props.gameEnded === true && this.props.status) &&
+                <div id="table" className={tableClassName}>
+                    {table}
+
+                </div>
+                {
+                    (this.props.gameEnded === true && this.props.status) &&
                     <div id="statusMessage">
                         {this.props.status}
+                        {
+                            (!this.props.viewer) &&
+                            <div id="offerAction">{offerButtonAction}</div>
+                        }
+
                     </div>
                 }
-                </div>
-                
+
             </div>
         );
     }

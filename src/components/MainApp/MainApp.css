@@ -4,5 +4,6 @@ body{
     /** RTL */
     text-align: right;
     direction: rtl;
+    font-family: Arimo, Arial;
 }
 
