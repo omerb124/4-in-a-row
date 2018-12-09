@@ -1,0 +1,14 @@
+#roomsPage {
+    background-color: #1abc9c;
+    color: white;
+    border-radius: 10px;
+    margin:0;
+}
+#roomsPage .title{
+    background-color:#16a085;
+    border-radius:10px;
+}
+#roomsPage button {
+    color: white;
+    background-color: #16a085;
+}

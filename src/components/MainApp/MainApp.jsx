@@ -9,6 +9,7 @@ import NotFoundPage from '../Pages/NotFoundPage.jsx';
 import CreateGameWaitPage from '../Pages/CreateGameWaitPage.jsx';
 import JoinGamePage from '../Pages/JoinGamePage.jsx';
 import ViewGamePage from '../Pages/ViewGamePage.jsx';
+import RoomsListPage from '../Pages/RoomsPage/RoomsListPage.jsx';
 import Test from '../Tests/test.jsx';
 
 import './MainApp.css';
@@ -23,7 +24,7 @@ class MainApp extends React.Component {
                 <div id="container">
                     <Header />
                     <Switch>
-                        <Route exact path='/' component={StartPage} />
+                        <Route exact path='/' component={RoomsListPage} />
                         <Route exact path='/game/:id' component={Game} />
                         <Route path='/game/:id/results' component={Game} />
                         <Route path='/game/:id/join' component={JoinGamePage} />

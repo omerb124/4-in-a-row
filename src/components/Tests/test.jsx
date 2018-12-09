@@ -13,8 +13,11 @@ class Test extends React.Component{
             case 'updateResultTableByRoomId':
                 Api.updateResultTableByRoomId("5c0923671e3eb8239c9a3af9",[['0','2'],['1','2']])
                 break;
+            case 'getRoomsData':
+                Api.getRoomsData((res) => {console.log(res); });
+                break;
         }
-
+        
         return(<div>Test has been done, logs are waiting on console.</div>);
     }
 }

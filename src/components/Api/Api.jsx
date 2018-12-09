@@ -100,6 +100,23 @@ function updateResultTableByRoomId(roomId, newBoard) {
         });
 }
 
+/* Get rooms data */
+function getRoomsData(cb){
+    axios({
+        method:'GET',
+        url : server + '/games-list'
+    })
+    .then((response) => {
+        // Decode json and call callback
+        console.log("Data1:");
+        console.log(response);
+        cb(null,response);
+    })
+    .catch((response) => {
+        console.log("Error has been occured during sending request for getting rooms data:", response);
+    });
+}
+
 export {
     getRoomData,
     createRoom,
@@ -110,5 +127,6 @@ export {
     updateResultTableByRoomId,
     offerNewGame,
     listenToNewGameOffer,
-    answerOffer
+    answerOffer,
+    getRoomsData
 };

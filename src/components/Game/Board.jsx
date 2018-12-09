@@ -87,7 +87,7 @@ class Board extends React.Component {
 
                 </div>
                 {
-                    (this.props.gameEnded === true && this.props.status) &&
+                    (this.props.gameEnded === true && this.props.status && !this.props.viewer) &&
                     <div id="statusMessage">
                         {
                             (!this.props.viewer) &&

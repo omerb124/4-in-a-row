@@ -7,7 +7,7 @@ function LoadingPage(){
         <div className="container-fluid">
             <div className="row">
                 <div className="col-sm-6 mx-auto">
-                    <div id="loadingGifContainer" class="centered">
+                    <div id="loadingGifContainer" className="centered">
                         <img src="../../../../loader.gif"/>
                     </div>
                 </div>
