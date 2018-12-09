@@ -75,6 +75,19 @@ function answerOffer(roomId, response, cb) {
         cb(null, v);
     });
 }
+
+// Close room
+function closeRoom(roomId){
+    socket.emit("closeRoom",roomId,"bobo");
+}
+
+// Listening to room closed event
+function isRoomClosed(cb){
+    socket.on("roomClosed",(v) => {
+        cb(null,v);
+    });
+}
+
 /** ************** HTTP ***************/
 
 // Sending a new result table for specific room id
@@ -117,6 +130,21 @@ function getRoomsData(cb){
     });
 }
 
+/* Get leaderboard data */
+function getLeaderboard(cb){
+    axios({
+        method: 'GET',
+        url: server + '/leaderboard'
+    })
+    .then((response) => {  
+        console.log(response);
+        cb(null,response);
+    })
+    .catch((response) => {
+        console.log("Error has been occured during sending requests for getting leaderboard:", response);
+    });
+}
+
 export {
     getRoomData,
     createRoom,
@@ -128,5 +156,8 @@ export {
     offerNewGame,
     listenToNewGameOffer,
     answerOffer,
-    getRoomsData
+    getRoomsData,
+    isRoomClosed,
+    closeRoom,
+    getLeaderboard
 };

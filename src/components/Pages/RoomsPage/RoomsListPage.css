@@ -3,10 +3,11 @@
     color: white;
     border-radius: 10px;
     margin:0;
+    border-bottom-left-radius: 0!important;
+    padding-bottom:5px;
 }
 #roomsPage .title{
     background-color:#16a085;
-    border-radius:10px;
 }
 #roomsPage button {
     color: white;

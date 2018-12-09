@@ -5,8 +5,8 @@ import { Switch, Route, Link, Redirect } from 'react-router-dom';
 import Board from './Board.jsx';
 import ResultsTable from './ResultsTable.jsx';
 import GameHeader from './GameHeader.jsx';
-import { getUpdate, doTurn, updateResultTableByRoomId, listenToNewGameOffer, offerNewGame, answerOffer } from '../Api/Api.jsx';
-import { timingSafeEqual } from 'crypto';
+import NiceBox from '../Utils/NiceBox.jsx';
+import { closeRoom, isRoomClosed, getUpdate, doTurn, updateResultTableByRoomId, listenToNewGameOffer, offerNewGame, answerOffer } from '../Api/Api.jsx';
 
 // Whole game component
 class Game extends React.Component {
@@ -56,6 +56,8 @@ class Game extends React.Component {
         this.answerOffer = this.answerOffer.bind(this);
         this.handleOfferResult = this.handleOfferResult.bind(this);
         this.handleNewGameOffer = this.handleNewGameOffer.bind(this);
+        this.handleLeavingRoom = this.handleLeavingRoom.bind(this);
+        this.handleRoomClosed = this.handleRoomClosed.bind(this);
         //this.handleGameStatus = this.handleGameStatus.bind(this);
 
     }
@@ -106,10 +108,27 @@ class Game extends React.Component {
         }
     }
 
+    // Handling leaving room
+    handleLeavingRoom(e) {
+        localStorage.setItem("gigi", "bigi");
+        e.preventDefault();
+        localStorage.setItem("gigi", "migi");
+        return e.returnValue = 'WHAT?';
+    }
+
+    componentWillUnmount() {
+        // Handling leaving room
+        document.removeEventListener("beforeunload", this.handleLeavingRoom);
+    }
     // Will mount
     componentWillMount() {
+        // Setup document title
+        document.title = "Game";
+
         // Handle keyup event
-        document.addEventListener("keyup", this._handleKeyPress.bind(this));
+        document.addEventListener("keyup", this.handleKeyPress.bind(this));
+
+        console.log(this.state);
 
         // Validate that room data has been passed
         try {
@@ -327,7 +346,7 @@ class Game extends React.Component {
     }
 
     // Handling keypress
-    _handleKeyPress(e) {
+    handleKeyPress(e) {
 
         // Validate that the turn is yours
         if (!this.yourTurn()) {
@@ -371,16 +390,39 @@ class Game extends React.Component {
         }
     }
 
-    // component did mount
-    componentDidMount() {
-        console.log("Listening to new game offer are active.");
-        listenToNewGameOffer(this.handleNewGameOffer);
+    // Handling room closed situation
+    handleRoomClosed(err, response) {
+        switch (response.status) {
+            case 200:
+                this.setState({
+                    roomClosed: "השחקן יצא מהחדר"
+                });
+                console.log("ma");
+                break;
+            case 500:
+                console.log("Room closed with error 500");
+                break;
+            default:
+                console.log("Room closed: ", response);
+        }
     }
 
-    answerOffer(answer){
+    // component did mount
+    componentDidMount() {
+
+        // Handling leaving room
+        document.addEventListener("beforeunload", this.handleLeavingRoom);
+
+        console.log("Listening to new game offer are active.");
+        listenToNewGameOffer(this.handleNewGameOffer);
+        console.log("Listening to event room closed");
+        isRoomClosed(this.handleRoomClosed);
+    }
+
+    answerOffer(answer) {
         answerOffer(this.state.roomId, answer, this.handleOfferResult);
     }
-    
+
     // Rendering board
     renderBoard(status) {
         console.log("Bobo" + this.state.gameEnded);
@@ -464,25 +506,25 @@ class Game extends React.Component {
         return status;
     }
 
-    offerNewGame(){
-        offerNewGame(this.state.roomId,this.handleOfferResult);
+    offerNewGame() {
+        offerNewGame(this.state.roomId, this.handleOfferResult);
         this.setState({
             offeredNewGame: true
         });
     }
 
-    handleNewGameOffer(err,response){
+    handleNewGameOffer(err, response) {
         this.setState({
             gotNewOffer: true
         });
         console.log("You got a new game offer!");
     }
 
-    handleOfferResult(err,response){
-        switch(response.status){
+    handleOfferResult(err, response) {
+        switch (response.status) {
             case 200:
                 // All good
-                if(response.data === true){
+                if (response.data === true) {
                     // Accpeted
                     // Start new game
                     this.setState({
@@ -497,7 +539,7 @@ class Game extends React.Component {
                     });
                     console.log("New game is about to start!");
                 }
-                else{
+                else {
                     // Declined
                     this.setState({
                         newGameDeclined: true
@@ -524,6 +566,11 @@ class Game extends React.Component {
         // Handling not found room
         if (this.state.roomNotFound) {
             return (<Redirect to="/roomNotFound" />);
+        }
+
+        // Room Closed
+        if (this.state.roomClosed) {
+            return (<NiceBox title="החדר נסגר" text={<span>{this.state.roomClosed}</span>} />);
         }
 
         // Handling game status

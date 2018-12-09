@@ -4,6 +4,8 @@ import LoadingPage from '../LoadingPage.jsx';
 import Sidebar from './Sidebar.jsx';
 import RoomsTable from './RoomsTable.jsx';
 import './RoomsListPage.css';
+import Leaderboard from './Leaderboard.jsx';
+import { Switch, Route } from 'react-router-dom';
 
 class RoomsListPage extends React.Component {
 
@@ -15,6 +17,10 @@ class RoomsListPage extends React.Component {
         this.handleRoomsData = this.handleRoomsData.bind(this);
         this.renderTable = this.renderTable.bind(this);
         this.doRandomChoose = this.doRandomChoose.bind(this);
+    }
+
+    componentWillMount() {
+        document.title = "Rooms";
     }
 
     handleRoomsData(err, data) {
@@ -76,15 +82,23 @@ class RoomsListPage extends React.Component {
         let sidebar = <Sidebar doRandomChoose={this.doRandomChoose} />;
         return (
 
-            <div class="container">
-                <div class="row">
+            <div className="container">
+                <div className="row">
                     <div id="roomsPage" class="col-sm-8 mx-auto text-center mt-3">
-                        <h2 class="title p-2 mt-3">
-                            יאללה בחר חדר
-    </h2>
-                        <div class="row">
+                        <h2 className="title p-2 mt-3">
+                            <Switch>
+                                <Route exact path="/" component={() => {return ("יאללה בחר חדר");}} />
+                                <Route exact path="/leaderboard" component={() => {return ("שחקנים מובילים");}} />
+
+                            </Switch>
+                            
+                        </h2>
+                        <div className="row">
                             {sidebar}
-                            {table}
+                            <Switch>
+                                <Route exact path="/" component={() => this.renderTable()} />
+                                <Route path="/leaderboard" component={() => <Leaderboard />} />
+                            </Switch>
                         </div>
                     </div>
 

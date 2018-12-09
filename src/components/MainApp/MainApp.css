@@ -5,5 +5,7 @@ body{
     text-align: right;
     direction: rtl;
     font-family: Arimo, Arial;
+    background-image: url('/background.png');
+    background-color:#ffffff;
 }
 

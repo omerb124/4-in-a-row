@@ -2,7 +2,7 @@ import React from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import ResultsTable from '../Game/ResultsTable.jsx';
 import axios from 'axios';
-import { getRoomData, getUpdate, waitForGameToStart } from '../Api/Api';
+import { isRoomClosed, getRoomData, getUpdate, waitForGameToStart } from '../Api/Api';
 import Board from '../Game/Board';
 import GameHeader from '../Game/GameHeader';
 import NiceBox from '../Utils/NiceBox';
@@ -20,8 +20,10 @@ class ViewGamePage extends React.Component {
         this.handleRoomData = this.handleRoomData.bind(this);
         this.handleGameUpdate = this.handleGameUpdate.bind(this);
         this.getStatus = this.getStatus.bind(this);
+        this.handleRoomClosed = this.handleRoomClosed.bind(this);
     }
 
+    
     handleGameUpdate(err, response) {
         console.log("Game update", response);
         switch (response.status) {
@@ -118,6 +120,9 @@ class ViewGamePage extends React.Component {
     }
 
     componentWillMount() {
+
+        document.title="View";
+
         const roomId = this.props.match.params.id;
 
         // Get updated room data
@@ -146,9 +151,29 @@ class ViewGamePage extends React.Component {
         )
     }
 
+    // Handling room closed situation
+    handleRoomClosed(err, response) {
+        switch (response.status) {
+            case 200:
+                this.setState({
+                    roomClosed: "השחקן יצא מהחדר"
+                });
+                console.log("ma");
+                break;
+            case 500:
+                console.log("Room closed with error 500");
+                break;
+            default:
+                console.log("Room closed: ", response);
+        }
+    }
+
     componentDidMount() {
         // Be aware of game updates
         getUpdate(this.handleGameUpdate);
+
+        // Listen to room closed event
+        isRoomClosed(this.handleRoomClosed);
     }
 
     getStatus() {
@@ -181,7 +206,10 @@ class ViewGamePage extends React.Component {
             );
         }
 
-        console.log("Game ended:", this.state.gameEnded);
+        // Room Closed
+        if (this.state.roomClosed) {
+            return (<NiceBox title="החדר נסגר" text={<span>אחד השחקנים יצא מהחדר.</span>} />);
+        }
 
         // Be sure that room data is available
         if (this.state.roomDataRecieved === false) {

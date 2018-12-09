@@ -4,10 +4,11 @@ import './NiceBox.css';
 function NiceBox(props) {
 
     const textStyle = props.textStyle ? props.textStyle : {};
+    const boxStyle = props.style ? props.style : {};
     return (
         <div className="container-fluid">
             <div className="row">
-                <div className="nice-box col-sm-5 mx-auto mt-5">
+                <div className="nice-box col-sm-5 mx-auto mt-5" style={boxStyle}>
                     <div id="title" className="text-center">
                         <h4>{props.title}</h4>
                     </div>
