@@ -505,6 +505,12 @@ class Game extends React.Component {
                     console.log("No more games for today.");
                 }
                 break;
+            case 401:
+                console.log("Error: offer cannot be done when game is still active.");
+                break;
+            case 404:
+                console.log("Error: 404 not found");
+                break;
             case 500:
                 console.log("Server error:", response.data);
                 break;

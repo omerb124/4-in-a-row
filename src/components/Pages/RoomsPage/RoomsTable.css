@@ -7,6 +7,10 @@
     background-color:#2c3e508c;
 }
 
+#roomsList table td:last-child {
+    text-align: center;
+}
+
 #roomsList table tr{
     padding:2px 0;
 }

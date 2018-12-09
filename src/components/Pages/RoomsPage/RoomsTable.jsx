@@ -14,7 +14,7 @@ class RoomsTable extends React.Component {
         let body = [];
         this.props.rooms.forEach((value,index) => {
             let roomName = "החדר של " + value.players[0].name;
-            body.push(<RoomsTableRow name={roomName} status={value.status} id={value._id.$oid} />);
+            body.push(<RoomsTableRow name={roomName} status={value.isOpen} id={value._id.$oid} />);
         });
 
         return <tbody>{body}</tbody>;

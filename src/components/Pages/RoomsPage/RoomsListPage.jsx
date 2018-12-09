@@ -73,7 +73,7 @@ class RoomsListPage extends React.Component {
         }
 
         let table = this.renderTable();
-        let sidebar = Sidebar(this.doRandomChoose);
+        let sidebar = <Sidebar doRandomChoose={this.doRandomChoose} />;
         return (
 
             <div class="container">
